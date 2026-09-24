@@ -114,14 +114,21 @@ export default function BoardPage() {
           </h3>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {overdueItems.map((i) => (
-              <button key={i.id} onClick={() => setSelected(i)} className="glass flex min-w-[220px] shrink-0 flex-col gap-1 rounded-xl p-2.5 text-left">
+              <div
+                key={i.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelected(i)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelected(i) }}
+                className="glass flex min-w-[220px] shrink-0 cursor-pointer flex-col gap-1 rounded-xl p-2.5 text-left"
+              >
                 <div className="flex items-center justify-between">
                   <PriorityStars value={i.priority} size={10} />
                   <span className="text-[10px] font-semibold text-red-600">{daysOverdue(i)}d overdue</span>
                 </div>
                 <p className="truncate text-xs font-medium">{i.title}</p>
                 <p className="text-[10px] text-muted-foreground">{i.community?.name ?? 'No community'} {i.follow_up_person ? `· ${i.follow_up_person.full_name}` : ''}</p>
-              </button>
+              </div>
             ))}
           </div>
         </div>

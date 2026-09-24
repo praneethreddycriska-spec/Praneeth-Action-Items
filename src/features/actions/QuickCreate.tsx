@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCreateActionItem } from '@/hooks/useActionItems'
 import { useCommunities, useProfiles } from '@/hooks/useCommunities'
 import { useSpeechRecognition } from '@/features/voice/useSpeechRecognition'
-import { parseSpokenAction } from '@/lib/ai/localParser'
+import { parseSpokenActionWithGroq } from '@/lib/ai/groqParser'
 import { PriorityStars } from '@/components/PriorityStars'
 import type { AIActionExtraction, Community, Profile } from '@/types'
 import { toast } from 'sonner'
@@ -42,8 +42,14 @@ export function QuickCreate() {
     setOpen(false)
   }
 
-  const runAiParse = (text: string) => {
-    const extraction = parseSpokenAction(text, communities as Community[], (profiles ?? []) as Profile[])
+  const [aiBusy, setAiBusy] = useState(false)
+  const [aiSource, setAiSource] = useState<'groq' | 'local' | null>(null)
+
+  const runAiParse = async (text: string) => {
+    setAiBusy(true)
+    const extraction = await parseSpokenActionWithGroq(text, communities as Community[], (profiles ?? []) as Profile[])
+    setAiBusy(false)
+    setAiSource(extraction.source)
     setAiPreview(extraction)
     setTitle(extraction.title)
     if (extraction.priority !== undefined) setPriority(extraction.priority)
@@ -91,16 +97,19 @@ export function QuickCreate() {
           </button>
           <button
             onClick={() => aiVoice.listening ? aiVoice.stop() : aiVoice.start((text) => runAiParse(text))}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border py-2 text-xs font-medium transition-colors ${aiVoice.listening ? 'border-fuchsia-400 bg-fuchsia-500/10 text-fuchsia-600' : 'border-violet-300/60 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 text-violet-600'}`}
+            disabled={aiBusy}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border py-2 text-xs font-medium transition-colors disabled:opacity-60 ${aiVoice.listening ? 'border-fuchsia-400 bg-fuchsia-500/10 text-fuchsia-600' : 'border-violet-300/60 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 text-violet-600'}`}
           >
-            <Sparkles size={14} /> {aiVoice.listening ? 'Listening…' : 'AI Create'}
+            <Sparkles size={14} /> {aiVoice.listening ? 'Listening…' : aiBusy ? 'Thinking…' : 'AI Create'}
           </button>
         </div>
         {!voice.supported && <p className="mb-2 text-[10px] text-muted-foreground">Voice input isn't supported in this browser — type instead.</p>}
 
         {aiPreview && (
           <div className="mb-3 rounded-xl border border-violet-300/50 bg-violet-500/5 p-2.5 text-xs">
-            <p className="mb-1 font-semibold text-violet-600">AI understood ({Math.round(aiPreview.confidence * 100)}% confidence)</p>
+            <p className="mb-1 font-semibold text-violet-600">
+              AI understood ({Math.round(aiPreview.confidence * 100)}% confidence · {aiSource === 'groq' ? 'Groq' : 'local parser'})
+            </p>
             <p>Review the fields below and adjust before creating.</p>
           </div>
         )}
