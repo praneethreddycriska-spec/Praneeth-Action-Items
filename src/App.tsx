@@ -4,6 +4,7 @@ import { RequireAdmin } from '@/components/admin/RequireAdmin'
 import { RequireTeamMember } from '@/components/admin/RequireTeamMember'
 import LandingPage from '@/pages/public/LandingPage'
 import AdminLoginPage from '@/pages/admin/AdminLoginPage'
+import SetPasswordPage from '@/pages/SetPasswordPage'
 import RequestsPage from '@/pages/admin/RequestsPage'
 import TeamPage from '@/pages/admin/TeamPage'
 import SettingsPage from '@/pages/admin/SettingsPage'
@@ -39,6 +40,7 @@ export default function App() {
       <Route path="/request" element={<LandingPage />} />
 
       <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/set-password" element={<SetPasswordPage />} />
 
       <Route path="/admin" element={<AdminLayoutRoute />}>
         <Route index element={<BoardPage />} />
