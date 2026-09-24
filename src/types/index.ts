@@ -91,6 +91,13 @@ export const REQUEST_STATUS_LABELS: Record<RequestStatus, string> = {
   archived: 'Archived',
 }
 
+export interface Organization {
+  id: string
+  name: string
+  created_by: string | null
+  created_at: string
+}
+
 export interface Requester {
   id: string
   name: string

@@ -1,9 +1,10 @@
 import { type ReactNode } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 
 export function RequireAdmin({ children }: { children: ReactNode }) {
   const { session, loading, isAdmin, adminChecked } = useAuth()
+  const location = useLocation()
 
   if (loading || (session && !adminChecked)) {
     return (
@@ -13,7 +14,9 @@ export function RequireAdmin({ children }: { children: ReactNode }) {
     )
   }
 
-  if (!session || !isAdmin) return <Navigate to="/admin/login" replace />
+  if (!session || !isAdmin) {
+    return <Navigate to="/admin/login" replace state={{ from: location.pathname + location.search }} />
+  }
 
   return <>{children}</>
 }

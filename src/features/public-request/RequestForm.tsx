@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles, Loader2, CheckCircle2 } from 'lucide-react'
 import { requestFormSchema, type RequestFormValues } from './schema'
 import { submitPublicRequest } from '@/lib/supabase/requests'
 import { supabase } from '@/lib/supabase/client'
+import type { Organization } from '@/types'
+
+const OTHER_ORG = '__other__'
 
 const EMPTY: RequestFormValues = {
   name: '', email: '', phone: '', organization: '', location: '',
@@ -19,6 +22,16 @@ export function RequestForm() {
   const [showAiHelper, setShowAiHelper] = useState(false)
   const [result, setResult] = useState<{ request_code: string } | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
+
+  const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [orgSelection, setOrgSelection] = useState('')
+  const [orgOther, setOrgOther] = useState('')
+
+  useEffect(() => {
+    supabase.from('organizations').select('*').order('name').then(({ data }) => {
+      if (data) setOrganizations(data as Organization[])
+    })
+  }, [])
 
   const set = <K extends keyof RequestFormValues>(key: K, value: RequestFormValues[K]) =>
     setValues((v) => ({ ...v, [key]: value }))
@@ -84,7 +97,7 @@ export function RequestForm() {
           <p className="text-lg font-bold text-primary">{result.request_code}</p>
         </div>
         <button
-          onClick={() => { setResult(null); setValues(EMPTY); setRawIdea(''); setShowAiHelper(false) }}
+          onClick={() => { setResult(null); setValues(EMPTY); setRawIdea(''); setShowAiHelper(false); setOrgSelection(''); setOrgOther('') }}
           className="rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-4 py-2 text-sm font-semibold text-white"
         >
           Submit another request
@@ -145,7 +158,31 @@ export function RequestForm() {
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Organization / Company">
-              <input value={values.organization} onChange={(e) => set('organization', e.target.value)} className={inputClass} />
+              <select
+                value={orgSelection}
+                onChange={(e) => {
+                  const v = e.target.value
+                  setOrgSelection(v)
+                  if (v === OTHER_ORG) {
+                    set('organization', orgOther)
+                  } else {
+                    set('organization', v)
+                  }
+                }}
+                className={inputClass}
+              >
+                <option value="">None</option>
+                {organizations.map((o) => <option key={o.id} value={o.name}>{o.name}</option>)}
+                <option value={OTHER_ORG}>Other (type below)</option>
+              </select>
+              {orgSelection === OTHER_ORG && (
+                <input
+                  value={orgOther}
+                  onChange={(e) => { setOrgOther(e.target.value); set('organization', e.target.value) }}
+                  placeholder="Your organization / company name"
+                  className={`${inputClass} mt-2`}
+                />
+              )}
             </Field>
             <Field label="Location">
               <input value={values.location} onChange={(e) => set('location', e.target.value)} className={inputClass} />

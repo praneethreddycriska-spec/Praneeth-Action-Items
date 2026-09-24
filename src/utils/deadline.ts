@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import type { ActionItem, DeadlineState } from '@/types'
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -49,4 +50,14 @@ export function urgencyScore(item: ActionItem): number {
 
 export function sortByUrgency(items: ActionItem[]): ActionItem[] {
   return [...items].sort((a, b) => urgencyScore(b) - urgencyScore(a))
+}
+
+/** "MMM d" for the current year, "MMM d, yyyy" otherwise — avoids ambiguous dates far from today. */
+export function formatSmartDate(iso: string, withTime = false): string {
+  const d = new Date(iso)
+  const sameYear = d.getFullYear() === new Date().getFullYear()
+  const pattern = sameYear
+    ? (withTime ? 'MMM d, HH:mm' : 'MMM d')
+    : (withTime ? 'MMM d, yyyy HH:mm' : 'MMM d, yyyy')
+  return format(d, pattern)
 }

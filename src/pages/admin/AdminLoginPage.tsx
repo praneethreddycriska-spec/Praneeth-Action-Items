@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -10,8 +10,10 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const location = useLocation()
+  const from = (location.state as { from?: string } | null)?.from || '/admin'
 
-  if (session && adminChecked && isAdmin) return <Navigate to="/admin" replace />
+  if (session && adminChecked && isAdmin) return <Navigate to={from} replace />
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()

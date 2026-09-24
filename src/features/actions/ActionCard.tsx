@@ -1,10 +1,9 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { MessageSquare, Check, User, UserPlus } from 'lucide-react'
-import { format } from 'date-fns'
 import type { ActionItem } from '@/types'
 import { cn } from '@/lib/utils'
-import { getDeadlineState, DEADLINE_STYLES } from '@/utils/deadline'
+import { getDeadlineState, DEADLINE_STYLES, formatSmartDate } from '@/utils/deadline'
 import { PriorityStars } from '@/components/PriorityStars'
 
 export function ActionCard({ item, onOpen, onComplete }: { item: ActionItem; onOpen: () => void; onComplete: () => void }) {
@@ -38,7 +37,7 @@ export function ActionCard({ item, onOpen, onComplete }: { item: ActionItem; onO
         )}
       </div>
 
-      <p className={cn('mb-1.5 text-sm font-medium leading-snug', item.status === 'completed' && 'text-muted-foreground line-through')}>
+      <p className={cn('mb-1.5 line-clamp-2 text-sm font-medium leading-snug', item.status === 'completed' && 'text-muted-foreground line-through')}>
         {item.title}
       </p>
 
@@ -49,7 +48,7 @@ export function ActionCard({ item, onOpen, onComplete }: { item: ActionItem; onO
           </span>
         )}
         <span className={cn('rounded-full border px-2 py-0.5 text-[10px] font-medium', DEADLINE_STYLES[deadlineState].className)}>
-          {item.deadline ? format(new Date(item.deadline), 'MMM d') : DEADLINE_STYLES[deadlineState].label}
+          {item.deadline ? formatSmartDate(item.deadline) : DEADLINE_STYLES[deadlineState].label}
         </span>
       </div>
 

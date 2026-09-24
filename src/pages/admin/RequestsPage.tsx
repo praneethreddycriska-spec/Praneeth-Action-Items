@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
-import { format } from 'date-fns'
+import { Search } from 'lucide-react'
 import type { RequestRecord, RequestStatus } from '@/types'
 import { REQUEST_STATUS_LABELS } from '@/types'
 import { useRequests } from '@/hooks/useRequests'
 import { RequestDetailDrawer } from '@/features/requests/RequestDetailDrawer'
 import { ConvertToActionModal } from '@/features/requests/ConvertToActionModal'
 import { cn } from '@/lib/utils'
+import { formatSmartDate } from '@/utils/deadline'
 
 const STATUS_TABS: (RequestStatus | 'all')[] = ['all', 'new', 'under_review', 'accepted', 'converted', 'in_progress', 'waiting', 'completed', 'rejected']
 
@@ -24,10 +25,27 @@ const STATUS_TONE: Record<RequestStatus, string> = {
 export default function RequestsPage() {
   const { data: requests = [], isLoading } = useRequests()
   const [tab, setTab] = useState<RequestStatus | 'all'>('all')
+  const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<RequestRecord | null>(null)
   const [converting, setConverting] = useState<RequestRecord | null>(null)
 
-  const filtered = useMemo(() => (tab === 'all' ? requests : requests.filter((r) => r.status === tab)), [requests, tab])
+  const filtered = useMemo(() => {
+    let list = tab === 'all' ? requests : requests.filter((r) => r.status === tab)
+    const q = search.trim().toLowerCase()
+    if (q) {
+      list = list.filter((r) =>
+        r.request_code.toLowerCase().includes(q) ||
+        r.name_snapshot.toLowerCase().includes(q) ||
+        (r.email_snapshot ?? '').toLowerCase().includes(q) ||
+        (r.phone_snapshot ?? '').toLowerCase().includes(q) ||
+        (r.organization ?? '').toLowerCase().includes(q) ||
+        r.requirement.toLowerCase().includes(q) ||
+        (r.target ?? '').toLowerCase().includes(q) ||
+        (r.expected_output ?? '').toLowerCase().includes(q),
+      )
+    }
+    return list
+  }, [requests, tab, search])
 
   return (
     <div className="h-full overflow-y-auto p-4">
@@ -35,6 +53,15 @@ export default function RequestsPage() {
         <div>
           <h1 className="text-lg font-semibold">Requests</h1>
           <p className="text-xs text-muted-foreground">{requests.length} total · {requests.filter((r) => r.status === 'new').length} new</p>
+        </div>
+        <div className="glass flex items-center gap-1.5 rounded-xl px-2.5 py-1.5">
+          <Search size={14} className="text-muted-foreground" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search name, email, phone, requirement…"
+            className="w-56 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
+          />
         </div>
       </div>
 
@@ -63,12 +90,12 @@ export default function RequestsPage() {
                 <span className="text-[10px] font-medium uppercase text-muted-foreground">{r.request_code}</span>
                 <span className={cn('rounded-full px-2 py-0.5 text-[10px] font-semibold', STATUS_TONE[r.status])}>{REQUEST_STATUS_LABELS[r.status]}</span>
               </div>
-              <p className="mb-1 text-sm font-semibold">{r.name_snapshot}</p>
+              <p className="mb-1 truncate text-sm font-semibold" title={r.name_snapshot}>{r.name_snapshot}</p>
               <p className="mb-2 line-clamp-2 text-xs text-muted-foreground">{r.requirement}</p>
               {r.target && <p className="mb-1 truncate text-[11px] text-muted-foreground">Target: {r.target}</p>}
               <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                <span>{format(new Date(r.created_at), 'MMM d, HH:mm')}</span>
-                {r.deadline && <span>Due {format(new Date(r.deadline), 'MMM d')}</span>}
+                <span>{formatSmartDate(r.created_at, true)}</span>
+                {r.deadline && <span>Due {formatSmartDate(r.deadline)}</span>}
               </div>
             </button>
           ))}
