@@ -83,7 +83,7 @@ export function QuickCreate() {
         initial={{ opacity: 0, y: -8, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -8, scale: 0.97 }}
-        className="glass-strong absolute right-4 top-16 z-50 w-96 rounded-2xl p-4"
+        className="glass-strong fixed inset-x-3 top-16 z-50 w-auto rounded-2xl p-4 sm:absolute sm:inset-x-auto sm:right-4 sm:w-96"
       >
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-semibold">New action item</h3>

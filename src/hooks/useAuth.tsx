@@ -9,6 +9,7 @@ interface AuthContextValue {
   profile: Profile | null
   loading: boolean
   isAdmin: boolean
+  isTeamMember: boolean
   adminChecked: boolean
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
@@ -37,12 +38,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!session?.user) { setProfile(null); setIsAdmin(false); setAdminChecked(true); return }
     setAdminChecked(false)
-    supabase.from('profiles').select('*').eq('id', session.user.id).single()
-      .then(({ data }) => setProfile(data as Profile | null))
-    supabase.rpc('is_admin').then(({ data }) => {
-      setIsAdmin(!!data)
+    let cancelled = false
+    Promise.all([
+      supabase.from('profiles').select('*').eq('id', session.user.id).single(),
+      supabase.rpc('is_admin'),
+    ]).then(([profileRes, adminRes]) => {
+      if (cancelled) return
+      setProfile(profileRes.data as Profile | null)
+      setIsAdmin(!!adminRes.data)
       setAdminChecked(true)
     })
+    return () => { cancelled = true }
   }, [session?.user])
 
   const signIn = async (email: string, password: string) => {
@@ -54,8 +60,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut()
   }
 
+  const isTeamMember = !isAdmin && profile?.role === 'team_member' && profile.active
+
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isAdmin, adminChecked, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isAdmin, isTeamMember, adminChecked, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   )

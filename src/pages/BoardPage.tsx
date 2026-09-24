@@ -96,14 +96,16 @@ export default function BoardPage() {
 
   return (
     <div className="relative flex h-full flex-col p-4">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h1 className="text-lg font-semibold">Board</h1>
-          <p className="text-xs text-muted-foreground">{format(new Date(), 'EEEE, MMM d yyyy')} · {filtered.length} action items</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <BoardControls groupMode={groupMode} onGroupMode={setGroupMode} search={search} onSearch={setSearch} minPriority={minPriority} onMinPriority={setMinPriority} />
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <h1 className="text-lg font-semibold">Board</h1>
+            <p className="text-xs text-muted-foreground">{format(new Date(), 'EEEE, MMM d yyyy')} · {filtered.length} action items</p>
+          </div>
           <QuickCreate />
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <BoardControls groupMode={groupMode} onGroupMode={setGroupMode} search={search} onSearch={setSearch} minPriority={minPriority} onMinPriority={setMinPriority} />
         </div>
       </div>
 

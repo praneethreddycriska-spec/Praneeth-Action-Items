@@ -5,15 +5,18 @@ import { ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function AdminLoginPage() {
-  const { session, isAdmin, adminChecked, signIn, signOut } = useAuth()
+  const { session, isAdmin, isTeamMember, adminChecked, profile, signIn, signOut } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const location = useLocation()
-  const from = (location.state as { from?: string } | null)?.from || '/admin'
+  const requestedFrom = (location.state as { from?: string } | null)?.from
+  const defaultDest = isAdmin ? '/admin' : '/team'
+  const namespace = isAdmin ? '/admin' : '/team'
+  const from = requestedFrom?.startsWith(namespace) ? requestedFrom : defaultDest
 
-  if (session && adminChecked && isAdmin) return <Navigate to={from} replace />
+  if (session && adminChecked && (isAdmin || isTeamMember)) return <Navigate to={from} replace />
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -23,6 +26,8 @@ export default function AdminLoginPage() {
     setBusy(false)
     if (result.error) { setError(result.error); return }
   }
+
+  const unauthorized = session && adminChecked && !isAdmin && !isTeamMember
 
   return (
     <div className="flex h-screen w-full items-center justify-center p-6">
@@ -37,14 +42,16 @@ export default function AdminLoginPage() {
             <ShieldCheck size={20} />
           </div>
           <div>
-            <h1 className="text-lg font-semibold">Admin Sign In</h1>
+            <h1 className="text-lg font-semibold">Sign In</h1>
             <p className="text-xs text-muted-foreground">Operations dashboard</p>
           </div>
         </div>
 
-        {session && adminChecked && !isAdmin && (
+        {unauthorized && (
           <div className="mb-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
-            This account is not authorized for admin access.
+            {profile && !profile.active
+              ? 'Your account has been deactivated. Contact your administrator.'
+              : 'This account is not authorized for dashboard access.'}
             <button onClick={signOut} className="ml-1 underline">Sign out</button>
           </div>
         )}

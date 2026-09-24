@@ -11,6 +11,7 @@ const OTHER_ORG = '__other__'
 const EMPTY: RequestFormValues = {
   name: '', email: '', phone: '', organization: '', location: '',
   requirement: '', target: '', expected_output: '', deadline: '', start_date: '', additional_details: '',
+  urgency: '', dependencies: '', important_instructions: '', reference_links: '',
 }
 
 export function RequestForm() {
@@ -149,11 +150,11 @@ export function RequestForm() {
             <input value={values.name} onChange={(e) => set('name', e.target.value)} className={inputClass} />
           </Field>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label="Email" error={errors.email}>
+            <Field label="Email" required error={errors.email}>
               <input type="email" value={values.email} onChange={(e) => set('email', e.target.value)} className={inputClass} />
             </Field>
             <Field label="Phone / WhatsApp">
-              <input value={values.phone} onChange={(e) => set('phone', e.target.value)} className={inputClass} />
+              <input type="tel" inputMode="tel" value={values.phone} onChange={(e) => set('phone', e.target.value)} className={inputClass} />
             </Field>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -221,12 +222,30 @@ export function RequestForm() {
               <input type="date" value={values.start_date} onChange={(e) => set('start_date', e.target.value)} className={inputClass} />
             </Field>
           </div>
+          <Field label="How urgent is this?">
+            <select value={values.urgency} onChange={(e) => set('urgency', e.target.value as RequestFormValues['urgency'])} className={inputClass}>
+              <option value="">Not specified</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
+          </Field>
         </fieldset>
 
         <fieldset className="space-y-3">
           <legend className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Additional Information</legend>
           <Field label="Additional notes">
             <textarea value={values.additional_details} onChange={(e) => set('additional_details', e.target.value)} rows={2} className={inputClass} />
+          </Field>
+          <Field label="Dependencies">
+            <textarea value={values.dependencies} onChange={(e) => set('dependencies', e.target.value)} rows={2} placeholder="Anything this depends on, or that needs to happen first" className={inputClass} />
+          </Field>
+          <Field label="Important instructions">
+            <textarea value={values.important_instructions} onChange={(e) => set('important_instructions', e.target.value)} rows={2} className={inputClass} />
+          </Field>
+          <Field label="Reference links">
+            <input value={values.reference_links} onChange={(e) => set('reference_links', e.target.value)} placeholder="Links to designs, docs, examples…" className={inputClass} />
           </Field>
         </fieldset>
 

@@ -11,12 +11,23 @@ export const STATUS_LABELS: Record<ActionStatus, string> = {
 
 export const STATUS_ORDER: ActionStatus[] = ['inbox', 'todo', 'in_progress', 'waiting', 'blocked', 'completed']
 
+export type UserRole = 'super_admin' | 'team_member'
+
 export interface Profile {
   id: string
   full_name: string | null
   email: string | null
+  phone: string | null
   avatar_color: string | null
+  role: UserRole
+  active: boolean
   created_at: string
+}
+
+export type Urgency = 'low' | 'medium' | 'high' | 'critical'
+
+export const URGENCY_LABELS: Record<Urgency, string> = {
+  low: 'Low', medium: 'Medium', high: 'High', critical: 'Critical',
 }
 
 export interface Community {
@@ -127,6 +138,13 @@ export interface RequestRecord {
   status: RequestStatus
   community_id: string | null
   source: 'public' | 'manual'
+  urgency: Urgency | null
+  dependencies: string | null
+  important_instructions: string | null
+  reference_links: string | null
+  auto_approved: boolean
+  converted_to_action: boolean
+  approved_at: string | null
   created_at: string
   updated_at: string
   converted_at: string | null

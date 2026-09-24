@@ -12,6 +12,10 @@ export interface SubmitRequestInput {
   deadline?: string | null
   start_date?: string | null
   additional_details?: string
+  urgency?: string
+  dependencies?: string
+  important_instructions?: string
+  reference_links?: string
 }
 
 export async function submitPublicRequest(input: SubmitRequestInput) {
@@ -27,6 +31,10 @@ export async function submitPublicRequest(input: SubmitRequestInput) {
     p_deadline: input.deadline || null,
     p_start_date: input.start_date || null,
     p_additional_details: input.additional_details || null,
+    p_urgency: input.urgency || null,
+    p_dependencies: input.dependencies || null,
+    p_important_instructions: input.important_instructions || null,
+    p_reference_links: input.reference_links || null,
   })
   if (error) throw error
   const row = Array.isArray(data) ? data[0] : data

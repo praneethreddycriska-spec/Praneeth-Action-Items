@@ -107,6 +107,25 @@ export function useMoveActionItem() {
     update.mutate({ id, status, sort_order, activity: { type: 'status_changed', detail: status } })
 }
 
+/** "Move To" — reassigns owner and notifies the new owner. Praneet keeps global visibility via admin RLS. */
+export function useMoveToOwner() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ actionItem, newOwnerId, newOwnerName }: { actionItem: ActionItem; newOwnerId: string; newOwnerName: string }) => {
+      const { error } = await supabase.from('action_items').update({ owner_id: newOwnerId }).eq('id', actionItem.id)
+      if (error) throw error
+      await logActivity(actionItem.id, 'owner_changed', `moved to ${newOwnerName}`)
+      await supabase.from('notifications').insert({
+        recipient_id: newOwnerId,
+        action_item_id: actionItem.id,
+        type: 'action_assigned',
+        message: `You were assigned "${actionItem.title}"${actionItem.community?.name ? ` · ${actionItem.community.name}` : ''}`,
+      })
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['action_items'] }),
+  })
+}
+
 export function useDeleteActionItem() {
   const qc = useQueryClient()
   return useMutation({

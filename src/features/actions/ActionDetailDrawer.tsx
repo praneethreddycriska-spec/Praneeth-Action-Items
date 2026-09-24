@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Send, Trash2 } from 'lucide-react'
+import { X, Send, Trash2, ArrowRightCircle } from 'lucide-react'
 import { format } from 'date-fns'
+import { toast } from 'sonner'
 import type { ActionItem, ActionStatus } from '@/types'
 import { STATUS_LABELS, STATUS_ORDER } from '@/types'
-import { useAddComment, useComments, useActivity, useUpdateActionItem, useDeleteActionItem } from '@/hooks/useActionItems'
+import { useAddComment, useComments, useActivity, useUpdateActionItem, useDeleteActionItem, useMoveToOwner } from '@/hooks/useActionItems'
 import { useCommunities, useProfiles } from '@/hooks/useCommunities'
 import { PriorityStars } from '@/components/PriorityStars'
 import { useAuth } from '@/hooks/useAuth'
 
 export function ActionDetailDrawer({ item, onClose }: { item: ActionItem | null; onClose: () => void }) {
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const [commentText, setCommentText] = useState('')
   const [actualOutput, setActualOutput] = useState(item?.actual_output ?? '')
   const { data: comments = [] } = useComments(item?.id ?? null)
@@ -20,6 +21,7 @@ export function ActionDetailDrawer({ item, onClose }: { item: ActionItem | null;
   const update = useUpdateActionItem()
   const del = useDeleteActionItem()
   const addComment = useAddComment()
+  const moveTo = useMoveToOwner()
 
   if (!item) return null
 
@@ -62,6 +64,36 @@ export function ActionDetailDrawer({ item, onClose }: { item: ActionItem | null;
               {communities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
+
+          {isAdmin && (
+            <div>
+              <label className="mb-1 flex items-center gap-1 text-[10px] font-medium uppercase text-muted-foreground">
+                <ArrowRightCircle size={12} /> Move To
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">
+                  Currently: <span className="font-medium text-foreground">{item.owner?.full_name ?? 'Unassigned'}</span>
+                </span>
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const person = profiles.find((p) => p.id === e.target.value)
+                    if (!person) return
+                    moveTo.mutate(
+                      { actionItem: item, newOwnerId: person.id, newOwnerName: person.full_name ?? 'them' },
+                      { onSuccess: () => toast.success(`Moved to ${person.full_name}`) },
+                    )
+                  }}
+                  className="flex-1 rounded-lg border border-border bg-white/70 px-2 py-1.5 text-xs dark:bg-white/5"
+                >
+                  <option value="" disabled>Move to…</option>
+                  {profiles.filter((p) => p.id !== item.owner_id && p.active).map((p) => (
+                    <option key={p.id} value={p.id}>{p.full_name} {p.role === 'super_admin' ? '(Admin)' : ''}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="mb-1 block text-[10px] font-medium uppercase text-muted-foreground">Priority</label>
