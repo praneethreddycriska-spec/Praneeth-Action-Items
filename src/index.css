@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 220 30% 97%;
+  --foreground: 222 30% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 30% 14%;
+  --primary: 250 84% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 94%;
+  --secondary-foreground: 222 30% 20%;
+  --muted: 214 30% 92%;
+  --muted-foreground: 220 12% 45%;
+  --accent: 280 70% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 75% 58%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 20% 88%;
+  --input: 220 20% 88%;
+  --ring: 250 84% 60%;
+  --radius: 1.1rem;
+}
+
+.dark {
+  --background: 230 28% 8%;
+  --foreground: 210 30% 96%;
+  --card: 228 26% 12%;
+  --card-foreground: 210 30% 96%;
+  --primary: 255 92% 70%;
+  --primary-foreground: 230 30% 10%;
+  --secondary: 228 22% 16%;
+  --secondary-foreground: 210 20% 90%;
+  --muted: 228 20% 16%;
+  --muted-foreground: 220 12% 65%;
+  --accent: 280 80% 68%;
+  --accent-foreground: 230 30% 10%;
+  --destructive: 0 70% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 228 18% 22%;
+  --input: 228 18% 22%;
+  --ring: 255 92% 70%;
+}
+
+* { border-color: hsl(var(--border)); }
+
+body {
+  @apply bg-background text-foreground antialiased;
+  background-image:
+    radial-gradient(circle at 12% 8%, hsl(255 90% 75% / 0.25), transparent 40%),
+    radial-gradient(circle at 85% 15%, hsl(190 90% 65% / 0.18), transparent 45%),
+    radial-gradient(circle at 50% 100%, hsl(320 85% 70% / 0.12), transparent 50%);
+  background-attachment: fixed;
+  font-feature-settings: 'ss01', 'cv01';
+}
+
+.glass {
+  background: linear-gradient(135deg, hsl(0 0% 100% / 0.55), hsl(0 0% 100% / 0.18));
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid hsl(0 0% 100% / 0.4);
+  box-shadow: 0 8px 32px -8px hsl(230 40% 20% / 0.15), inset 0 1px 0 hsl(0 0% 100% / 0.5);
+}
+
+.dark .glass {
+  background: linear-gradient(135deg, hsl(230 30% 22% / 0.55), hsl(230 30% 14% / 0.35));
+  border: 1px solid hsl(0 0% 100% / 0.08);
+  box-shadow: 0 8px 32px -8px hsl(0 0% 0% / 0.5), inset 0 1px 0 hsl(0 0% 100% / 0.06);
+}
+
+.glass-strong {
+  background: linear-gradient(135deg, hsl(0 0% 100% / 0.75), hsl(0 0% 100% / 0.35));
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid hsl(0 0% 100% / 0.55);
+}
+
+.dark .glass-strong {
+  background: linear-gradient(135deg, hsl(230 30% 24% / 0.75), hsl(230 30% 16% / 0.5));
+  border: 1px solid hsl(0 0% 100% / 0.1);
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / 0.3); border-radius: 999px; }
+::-webkit-scrollbar-track { background: transparent; }
