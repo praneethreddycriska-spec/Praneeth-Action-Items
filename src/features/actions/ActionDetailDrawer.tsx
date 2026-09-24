@@ -92,6 +92,16 @@ export function ActionDetailDrawer({ item, onClose }: { item: ActionItem | null;
           </div>
 
           <div>
+            <label className="mb-1 block text-[10px] font-medium uppercase text-muted-foreground">Raised by</label>
+            <input
+              defaultValue={item.requested_by_name ?? ''}
+              onBlur={(e) => patch({ requested_by_name: e.target.value || null }, 'raised-by changed')}
+              placeholder="Who asked for this?"
+              className="w-full rounded-lg border border-border bg-white/70 px-2 py-1.5 text-xs dark:bg-white/5"
+            />
+          </div>
+
+          <div>
             <label className="mb-1 block text-[10px] font-medium uppercase text-muted-foreground">Description</label>
             <textarea
               defaultValue={item.description ?? ''}

@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { MessageSquare, Check, User } from 'lucide-react'
+import { MessageSquare, Check, User, UserPlus } from 'lucide-react'
 import { format } from 'date-fns'
 import type { ActionItem } from '@/types'
 import { cn } from '@/lib/utils'
@@ -53,8 +53,11 @@ export function ActionCard({ item, onOpen, onComplete }: { item: ActionItem; onO
         </span>
       </div>
 
-      {(item.follow_up_person || item.expected_output) && (
+      {(item.follow_up_person || item.expected_output || item.requested_by_name) && (
         <div className="space-y-0.5 border-t border-border/60 pt-1.5 text-[11px] text-muted-foreground">
+          {item.requested_by_name && (
+            <div className="flex items-center gap-1"><UserPlus size={10} /> Raised by {item.requested_by_name}</div>
+          )}
           {item.follow_up_person && (
             <div className="flex items-center gap-1"><User size={10} /> {item.follow_up_person.full_name}</div>
           )}

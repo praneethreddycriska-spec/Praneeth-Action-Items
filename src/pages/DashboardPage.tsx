@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useActionItems } from '@/hooks/useActionItems'
+import { useRequests } from '@/hooks/useRequests'
 import { getDeadlineState } from '@/utils/deadline'
 import { isToday, isThisWeek } from 'date-fns'
 
@@ -12,8 +13,32 @@ function KpiCard({ label, value, tone }: { label: string; value: number | string
   )
 }
 
+function FunnelStep({ label, value, tone }: { label: string; value: number; tone?: string }) {
+  return (
+    <div className="rounded-xl bg-secondary/50 px-3 py-2 text-center">
+      <p className="text-lg font-bold" style={tone ? { color: tone } : undefined}>{value}</p>
+      <p className="text-[10px] uppercase text-muted-foreground">{label}</p>
+    </div>
+  )
+}
+
+function FunnelArrow() {
+  return <span className="text-muted-foreground">→</span>
+}
+
 export default function DashboardPage() {
   const { data: items = [] } = useActionItems()
+  const { data: requests = [] } = useRequests()
+
+  const requestKpis = useMemo(() => {
+    const newCount = requests.filter((r) => r.status === 'new').length
+    const thisWeek = requests.filter((r) => isThisWeek(new Date(r.created_at))).length
+    const accepted = requests.filter((r) => ['accepted', 'converted', 'in_progress', 'waiting', 'completed'].includes(r.status)).length
+    const converted = requests.filter((r) => ['converted', 'in_progress', 'waiting', 'completed'].includes(r.status)).length
+    const completed = requests.filter((r) => r.status === 'completed').length
+    const rejected = requests.filter((r) => r.status === 'rejected').length
+    return { total: requests.length, newCount, thisWeek, accepted, converted, completed, rejected }
+  }, [requests])
 
   const kpis = useMemo(() => {
     const open = items.filter((i) => i.status !== 'completed')
@@ -60,6 +85,13 @@ export default function DashboardPage() {
       <h1 className="mb-4 text-lg font-semibold">Analytics</h1>
 
       <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <KpiCard label="Total requests" value={requestKpis.total} />
+        <KpiCard label="New requests" value={requestKpis.newCount} tone="#0284C7" />
+        <KpiCard label="Requests this week" value={requestKpis.thisWeek} />
+        <KpiCard label="Converted" value={requestKpis.converted} tone="#059669" />
+      </div>
+
+      <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <KpiCard label="Open" value={kpis.open} />
         <KpiCard label="Overdue" value={kpis.overdue} tone="#DC2626" />
         <KpiCard label="Due today" value={kpis.dueToday} tone="#EA580C" />
@@ -68,6 +100,20 @@ export default function DashboardPage() {
         <KpiCard label="Unassigned" value={kpis.unassigned} />
         <KpiCard label="Waiting" value={kpis.waiting} />
         <KpiCard label="Completed today" value={kpis.completedToday} tone="#059669" />
+      </div>
+
+      <div className="mb-4 glass rounded-2xl p-4">
+        <h3 className="mb-3 text-sm font-semibold">Request conversion funnel</h3>
+        <div className="flex flex-wrap items-center gap-3 text-xs">
+          <FunnelStep label="Requests" value={requestKpis.total} />
+          <FunnelArrow />
+          <FunnelStep label="Accepted" value={requestKpis.accepted} />
+          <FunnelArrow />
+          <FunnelStep label="Converted" value={requestKpis.converted} />
+          <FunnelArrow />
+          <FunnelStep label="Completed" value={requestKpis.completed} tone="#059669" />
+          {requestKpis.rejected > 0 && <span className="ml-auto text-red-500">{requestKpis.rejected} rejected</span>}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

@@ -64,6 +64,8 @@ export interface ActionItem {
   archived_at: string | null
   waiting_for_person_id: string | null
   waiting_expected_response_date: string | null
+  source_request_id: string | null
+  requested_by_name: string | null
   created_at: string
   updated_at: string
   // joined
@@ -71,6 +73,61 @@ export interface ActionItem {
   owner?: Profile | null
   follow_up_person?: Profile | null
   tags?: Tag[]
+}
+
+export type RequestStatus =
+  | 'new' | 'under_review' | 'accepted' | 'converted' | 'in_progress'
+  | 'waiting' | 'completed' | 'rejected' | 'archived'
+
+export const REQUEST_STATUS_LABELS: Record<RequestStatus, string> = {
+  new: 'New',
+  under_review: 'Under Review',
+  accepted: 'Accepted',
+  converted: 'Converted',
+  in_progress: 'In Progress',
+  waiting: 'Waiting',
+  completed: 'Completed',
+  rejected: 'Rejected',
+  archived: 'Archived',
+}
+
+export interface Requester {
+  id: string
+  name: string
+  email: string | null
+  phone: string | null
+  organization: string | null
+  location: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface RequestRecord {
+  id: string
+  request_code: string
+  requester_id: string | null
+  name_snapshot: string
+  email_snapshot: string | null
+  phone_snapshot: string | null
+  organization: string | null
+  location: string | null
+  requirement: string
+  target: string | null
+  expected_output: string | null
+  deadline: string | null
+  start_date: string | null
+  additional_details: string | null
+  status: RequestStatus
+  community_id: string | null
+  source: 'public' | 'manual'
+  created_at: string
+  updated_at: string
+  converted_at: string | null
+  completed_at: string | null
+  archived_at: string | null
+  community?: Community | null
+  requester?: Requester | null
+  linked_actions?: ActionItem[]
 }
 
 export interface ActionItemComment {

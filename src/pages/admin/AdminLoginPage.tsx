@@ -1,25 +1,25 @@
 import { useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { cn } from '@/lib/utils'
 
-export default function AuthPage() {
-  const { signIn, signUp } = useAuth()
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+export default function AdminLoginPage() {
+  const { session, isAdmin, adminChecked, signIn, signOut } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+
+  if (session && adminChecked && isAdmin) return <Navigate to="/admin" replace />
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setBusy(true)
     setError(null)
-    const result = mode === 'signin' ? await signIn(email, password) : await signUp(email, password, fullName)
+    const result = await signIn(email, password)
     setBusy(false)
-    if (result.error) setError(result.error)
+    if (result.error) { setError(result.error); return }
   }
 
   return (
@@ -32,40 +32,22 @@ export default function AuthPage() {
       >
         <div className="mb-6 flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg">
-            <Sparkles size={20} />
+            <ShieldCheck size={20} />
           </div>
           <div>
-            <h1 className="text-lg font-semibold">Action Items</h1>
-            <p className="text-xs text-muted-foreground">Your execution operating system</p>
+            <h1 className="text-lg font-semibold">Admin Sign In</h1>
+            <p className="text-xs text-muted-foreground">Operations dashboard</p>
           </div>
         </div>
 
-        <div className="mb-5 flex rounded-xl bg-secondary/60 p-1 text-sm">
-          {(['signin', 'signup'] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setMode(m)}
-              className={cn(
-                'flex-1 rounded-lg py-1.5 font-medium transition-all',
-                mode === m ? 'bg-white shadow-sm dark:bg-white/10' : 'text-muted-foreground',
-              )}
-            >
-              {m === 'signin' ? 'Sign in' : 'Sign up'}
-            </button>
-          ))}
-        </div>
+        {session && adminChecked && !isAdmin && (
+          <div className="mb-4 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+            This account is not authorized for admin access.
+            <button onClick={signOut} className="ml-1 underline">Sign out</button>
+          </div>
+        )}
 
         <form onSubmit={submit} className="space-y-3">
-          {mode === 'signup' && (
-            <input
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Full name"
-              className="w-full rounded-xl border border-border bg-white/70 px-3 py-2.5 text-sm outline-none ring-primary/40 focus:ring-2 dark:bg-white/5"
-              required
-            />
-          )}
           <input
             type="email"
             value={email}
@@ -81,7 +63,6 @@ export default function AuthPage() {
             placeholder="Password"
             className="w-full rounded-xl border border-border bg-white/70 px-3 py-2.5 text-sm outline-none ring-primary/40 focus:ring-2 dark:bg-white/5"
             required
-            minLength={6}
           />
           {error && <p className="text-xs text-destructive">{error}</p>}
           <button
@@ -89,7 +70,7 @@ export default function AuthPage() {
             disabled={busy}
             className="w-full rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 transition-transform active:scale-[0.98] disabled:opacity-60"
           >
-            {busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Create account'}
+            {busy ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
       </motion.div>

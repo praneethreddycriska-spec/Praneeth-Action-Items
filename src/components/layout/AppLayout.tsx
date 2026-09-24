@@ -1,13 +1,14 @@
 import { type ReactNode, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { LayoutGrid, Users, BarChart3, Sparkles, LogOut, Menu, X } from 'lucide-react'
+import { LayoutGrid, Users, BarChart3, Sparkles, LogOut, Menu, X, Inbox } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
 const NAV = [
-  { to: '/board', label: 'Board', icon: LayoutGrid },
-  { to: '/communities', label: 'Communities', icon: Users },
-  { to: '/dashboard', label: 'Analytics', icon: BarChart3 },
+  { to: '/admin', label: 'Board', icon: LayoutGrid, end: true },
+  { to: '/admin/requests', label: 'Requests', icon: Inbox },
+  { to: '/admin/communities', label: 'Communities', icon: Users },
+  { to: '/admin/dashboard', label: 'Analytics', icon: BarChart3 },
 ]
 
 export default function AppLayout({ children }: { children: ReactNode }) {
@@ -32,10 +33,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </div>
 
         <nav className="flex flex-1 flex-col gap-1">
-          {NAV.map(({ to, label, icon: Icon }) => (
+          {NAV.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
+              end={end}
               onClick={() => setMobileOpen(false)}
               className={({ isActive }) =>
                 cn(

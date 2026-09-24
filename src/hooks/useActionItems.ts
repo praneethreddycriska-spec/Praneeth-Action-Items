@@ -61,6 +61,8 @@ export function useCreateActionItem() {
           status: input.status ?? 'todo',
           deadline: input.deadline ?? null,
           expected_output: input.expected_output ?? null,
+          source_request_id: input.source_request_id ?? null,
+          requested_by_name: input.requested_by_name ?? null,
           created_by: userData.user?.id,
           sort_order: Date.now(),
         })

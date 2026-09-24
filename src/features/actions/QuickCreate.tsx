@@ -16,6 +16,7 @@ export function QuickCreate() {
   const [priority, setPriority] = useState(5)
   const [deadline, setDeadline] = useState('')
   const [followUpId, setFollowUpId] = useState('')
+  const [raisedBy, setRaisedBy] = useState('')
   const [aiPreview, setAiPreview] = useState<AIActionExtraction | null>(null)
 
   const { data: communities = [] } = useCommunities()
@@ -25,7 +26,7 @@ export function QuickCreate() {
   const aiVoice = useSpeechRecognition()
 
   const reset = () => {
-    setTitle(''); setCommunityId(''); setPriority(5); setDeadline(''); setFollowUpId(''); setAiPreview(null)
+    setTitle(''); setCommunityId(''); setPriority(5); setDeadline(''); setFollowUpId(''); setRaisedBy(''); setAiPreview(null)
   }
 
   const submit = () => {
@@ -36,6 +37,7 @@ export function QuickCreate() {
       priority,
       deadline: deadline ? new Date(deadline).toISOString() : null,
       follow_up_person_id: followUpId || null,
+      requested_by_name: raisedBy.trim() || null,
     })
     toast.success('Action item created')
     reset()
@@ -120,6 +122,12 @@ export function QuickCreate() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title (required)"
+            className="w-full rounded-xl border border-border bg-white/70 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/40 dark:bg-white/5"
+          />
+          <input
+            value={raisedBy}
+            onChange={(e) => setRaisedBy(e.target.value)}
+            placeholder="Raised by (who asked for this?)"
             className="w-full rounded-xl border border-border bg-white/70 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/40 dark:bg-white/5"
           />
           <div className="flex gap-2">
