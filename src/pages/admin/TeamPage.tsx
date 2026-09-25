@@ -86,7 +86,7 @@ export default function TeamPage() {
         <h1 className="text-lg font-semibold">Team Members</h1>
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-1 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-3 py-2 text-sm font-semibold text-white"
+          className="flex items-center gap-1 rounded-xl accent-gradient px-3 py-2 text-sm font-semibold text-white"
         ><Plus size={15} /> Add Team Member</button>
       </div>
 
@@ -185,7 +185,7 @@ export default function TeamPage() {
                 <button
                   onClick={submitInvite}
                   disabled={!name.trim() || !email.trim() || invite.isPending}
-                  className="w-full rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                  className="w-full rounded-xl accent-gradient py-2.5 text-sm font-semibold disabled:opacity-50"
                 >
                   {invite.isPending ? 'Creating…' : 'Create account'}
                 </button>
@@ -263,7 +263,7 @@ function EditMemberModal({ member, onClose }: { member: Profile; onClose: () => 
         <button
           onClick={save}
           disabled={!name.trim() || update.isPending}
-          className="mt-4 w-full rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+          className="mt-4 w-full rounded-xl accent-gradient py-2.5 text-sm font-semibold disabled:opacity-50"
         >
           {update.isPending ? 'Saving…' : 'Save changes'}
         </button>

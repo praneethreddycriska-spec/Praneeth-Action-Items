@@ -107,7 +107,7 @@ export function RequestForm() {
         </div>
         <button
           onClick={() => { setResult(null); setValues(EMPTY); setRawIdea(''); setShowAiHelper(false); setOrgSelection(''); setOrgOther('') }}
-          className="rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-4 py-2 text-sm font-semibold text-white"
+          className="rounded-xl accent-gradient px-4 py-2 text-sm font-semibold text-white"
         >
           Submit another request
         </button>
@@ -142,7 +142,7 @@ export function RequestForm() {
             type="button"
             onClick={runAiHelper}
             disabled={aiBusy || !rawIdea.trim()}
-            className="flex items-center gap-1.5 rounded-xl bg-violet-500 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-xl bg-violet-500 px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
           >
             {aiBusy ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
             {aiBusy ? 'Structuring…' : 'Fill in the fields below'}
@@ -262,7 +262,7 @@ export function RequestForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 transition-transform active:scale-[0.99] disabled:opacity-60"
+          className="w-full rounded-xl accent-gradient py-3 text-sm font-semibold shadow-lg transition-transform active:scale-[0.99] disabled:opacity-60"
         >
           {submitting ? 'Submitting…' : 'Submit Request'}
         </button>

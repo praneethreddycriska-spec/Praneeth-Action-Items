@@ -41,7 +41,7 @@ export function RequestDetailDrawer({ request, onClose, onConvert }: { request: 
               {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{REQUEST_STATUS_LABELS[s]}</option>)}
             </select>
             {request.status === 'new' || request.status === 'under_review' || request.status === 'accepted' ? (
-              <button onClick={onConvert} className="rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 px-3 py-1 text-xs font-semibold text-white">
+              <button onClick={onConvert} className="rounded-lg accent-gradient px-3 py-1 text-xs font-semibold text-white">
                 Convert to Action
               </button>
             ) : null}

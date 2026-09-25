@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
         className="glass-strong w-full max-w-sm rounded-3xl p-8"
       >
         <div className="mb-6 flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl accent-gradient shadow-lg">
             <ShieldCheck size={20} />
           </div>
           <div>
@@ -77,7 +77,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 transition-transform active:scale-[0.98] disabled:opacity-60"
+            className="w-full rounded-xl accent-gradient py-2.5 text-sm font-semibold shadow-lg transition-transform active:scale-[0.98] disabled:opacity-60"
           >
             {busy ? 'Signing in…' : 'Sign in'}
           </button>

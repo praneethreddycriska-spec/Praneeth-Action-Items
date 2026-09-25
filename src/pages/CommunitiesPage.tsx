@@ -63,7 +63,7 @@ export default function CommunitiesPage() {
         </div>
         <button
           onClick={() => { if (name.trim()) { create.mutate({ name: name.trim(), color }); setName('') } }}
-          className="flex items-center gap-1 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-3 py-2 text-sm font-semibold text-white"
+          className="flex items-center gap-1 rounded-xl accent-gradient px-3 py-2 text-sm font-semibold text-white"
         ><Plus size={15} /> Create</button>
       </div>
 
@@ -115,7 +115,7 @@ export default function CommunitiesPage() {
         <button
           onClick={submitOrg}
           disabled={!orgName.trim() || createOrg.isPending}
-          className="flex items-center gap-1 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="flex items-center gap-1 rounded-xl accent-gradient px-3 py-2 text-sm font-semibold disabled:opacity-50"
         ><Plus size={15} /> Add</button>
       </div>
 

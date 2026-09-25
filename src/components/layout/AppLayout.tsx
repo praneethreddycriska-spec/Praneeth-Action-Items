@@ -4,6 +4,7 @@ import { LayoutGrid, Users, BarChart3, Sparkles, LogOut, Menu, X, Inbox, UserCog
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { NotificationBell } from '@/components/NotificationBell'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const ADMIN_NAV = [
   { to: '/admin', label: 'Board', icon: LayoutGrid, end: true },
@@ -38,7 +39,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         )}
       >
         <div className="mb-6 flex items-center gap-2 px-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-lg">
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl accent-gradient shadow-lg">
             <Sparkles size={18} />
           </div>
           <span className="text-base font-semibold">Action Items</span>
@@ -86,7 +87,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <div className="flex items-center gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:justify-end">
           <button className="glass rounded-xl p-2 md:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
           <span className="text-sm font-semibold md:hidden">Action Items</span>
-          <div className="ml-auto md:ml-0"><NotificationBell /></div>
+          <div className="ml-auto flex items-center gap-2 md:ml-0">
+            <ThemeToggle />
+            <NotificationBell />
+          </div>
         </div>
 
         <div className="min-h-0 flex-1 overflow-hidden pb-16 md:pb-0">{children}</div>

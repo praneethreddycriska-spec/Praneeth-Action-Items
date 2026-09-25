@@ -5,6 +5,36 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Action Items</title>
+    <script>
+      (function () {
+        try {
+          var mode = localStorage.getItem('action-items-theme-mode') || 'system';
+          var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) document.documentElement.classList.add('dark');
+
+          var hex = localStorage.getItem('action-items-theme-color') || '#7C6CF6';
+          var c = hex.replace('#', '');
+          var r = parseInt(c.slice(0, 2), 16) / 255, g = parseInt(c.slice(2, 4), 16) / 255, b = parseInt(c.slice(4, 6), 16) / 255;
+          var max = Math.max(r, g, b), min = Math.min(r, g, b), h = 0, s = 0, l = (max + min) / 2;
+          if (max !== min) {
+            var d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+            else if (max === g) h = (b - r) / d + 2;
+            else h = (r - g) / d + 4;
+            h /= 6;
+          }
+          h = Math.round(h * 360); s = Math.round(s * 100); l = Math.round(l * 100);
+          var triplet = h + ' ' + s + '% ' + l + '%';
+          var fg = l > 65 ? '230 30% 12%' : '0 0% 100%';
+          var root = document.documentElement.style;
+          root.setProperty('--primary', triplet);
+          root.setProperty('--primary-foreground', fg);
+          root.setProperty('--ring', triplet);
+          root.setProperty('--accent', h + ' ' + s + '% 58%');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

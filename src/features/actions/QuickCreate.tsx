@@ -70,7 +70,7 @@ export function QuickCreate() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 px-3.5 py-2 text-sm font-semibold text-white shadow-md shadow-violet-500/25 transition-transform active:scale-95"
+        className="flex items-center gap-1.5 rounded-xl accent-gradient px-3.5 py-2 text-sm font-semibold shadow-md transition-transform active:scale-95"
       >
         <Plus size={16} /> New Action
       </button>
@@ -155,7 +155,7 @@ export function QuickCreate() {
         <button
           onClick={submit}
           disabled={!title.trim()}
-          className="mt-3 w-full rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 py-2.5 text-sm font-semibold text-white shadow-md disabled:opacity-50"
+          className="mt-3 w-full rounded-xl accent-gradient py-2.5 text-sm font-semibold shadow-md disabled:opacity-50"
         >
           Create Action
         </button>

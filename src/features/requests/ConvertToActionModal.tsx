@@ -104,7 +104,7 @@ export function ConvertToActionModal({ request, onClose }: { request: RequestRec
         <button
           onClick={submit}
           disabled={!title.trim() || createAction.isPending}
-          className="mt-4 w-full rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 py-2.5 text-sm font-semibold text-white shadow-md disabled:opacity-50"
+          className="mt-4 w-full rounded-xl accent-gradient py-2.5 text-sm font-semibold shadow-md disabled:opacity-50"
         >
           {createAction.isPending ? 'Creating…' : 'Create Action Item'}
         </button>
