@@ -1,28 +1,44 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { KeyRound, CheckCircle2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function SetPasswordPage() {
-  const { session, isAdmin, isTeamMember, adminChecked } = useAuth()
+  const { session, isAdmin } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState(false)
   const [ready, setReady] = useState(false)
+  const [verifyFailed, setVerifyFailed] = useState(false)
 
   useEffect(() => {
-    // supabase-js auto-detects the access/refresh token in the URL hash on
-    // load (detectSessionInUrl is on by default) and establishes a session.
-    // We just need to wait for that before letting the user set a password.
     if (session) { setReady(true); return }
+
+    // Our own links (from admin_invite_team_member / admin_reset_team_member_password)
+    // carry a raw token_hash — verify it directly, which never depends on
+    // Supabase's Redirect URL allow-list or its hosted /verify redirect.
+    const tokenHash = searchParams.get('token_hash')
+    const type = searchParams.get('type')
+    if (tokenHash && type === 'recovery') {
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error }) => {
+        if (error) setVerifyFailed(true)
+        setReady(true)
+      })
+      return
+    }
+
+    // Fallback: supabase-js auto-detects an access/refresh token in the URL
+    // hash on load (detectSessionInUrl is on by default) for links that went
+    // through Supabase's own /verify redirect.
     const timeout = setTimeout(() => setReady(true), 2500)
     return () => clearTimeout(timeout)
-  }, [session])
+  }, [session, searchParams])
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,7 +61,7 @@ export default function SetPasswordPage() {
     )
   }
 
-  if (!session) {
+  if (!session || verifyFailed) {
     return (
       <div className="flex h-screen w-full items-center justify-center p-6">
         <div className="glass-strong w-full max-w-sm rounded-3xl p-8 text-center">
