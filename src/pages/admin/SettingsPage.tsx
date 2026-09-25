@@ -28,16 +28,20 @@ export default function SettingsPage() {
           When OFF, new requests wait in the Requests queue for you to review and convert manually.
         </p>
 
-        <button
-          onClick={toggle}
-          disabled={isLoading || setSetting.isPending}
-          className={`relative h-8 w-16 rounded-full transition-colors ${autoApproval ? 'bg-emerald-500' : 'bg-secondary'}`}
-        >
-          <span
-            className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${autoApproval ? 'translate-x-9' : 'translate-x-1'}`}
-          />
-        </button>
-        <span className="ml-3 align-middle text-sm font-medium">{autoApproval ? 'ON' : 'OFF'}</span>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={toggle}
+            disabled={isLoading || setSetting.isPending}
+            aria-pressed={autoApproval}
+            className={`relative inline-flex h-8 w-16 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${autoApproval ? 'bg-emerald-500' : 'bg-secondary'}`}
+          >
+            <span
+              className={`absolute left-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${autoApproval ? 'translate-x-8' : 'translate-x-0'}`}
+            />
+          </button>
+          <span className="text-sm font-medium">{autoApproval ? 'ON' : 'OFF'}</span>
+        </div>
       </div>
     </div>
   )
