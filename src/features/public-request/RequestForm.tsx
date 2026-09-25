@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles, Loader2, CheckCircle2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { requestFormSchema, type RequestFormValues } from './schema'
 import { submitPublicRequest } from '@/lib/supabase/requests'
 import { supabase } from '@/lib/supabase/client'
@@ -63,6 +64,13 @@ export function RequestForm() {
       const fieldErrors: Partial<Record<keyof RequestFormValues, string>> = {}
       for (const issue of parsed.error.issues) fieldErrors[issue.path[0] as keyof RequestFormValues] = issue.message
       setErrors(fieldErrors)
+      const firstKey = parsed.error.issues[0]?.path[0] as string | undefined
+      const firstField = firstKey ? document.querySelector<HTMLElement>(`[name="${firstKey}"]`) : null
+      if (firstField) {
+        firstField.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        firstField.focus()
+      }
+      toast.error('Please fill in the required fields highlighted below')
       return
     }
     setErrors({})
@@ -147,11 +155,11 @@ export function RequestForm() {
         <fieldset className="space-y-3">
           <legend className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Personal Information</legend>
           <Field label="Full Name" required error={errors.name}>
-            <input value={values.name} onChange={(e) => set('name', e.target.value)} className={inputClass} />
+            <input name="name" value={values.name} onChange={(e) => set('name', e.target.value)} className={inputClass} />
           </Field>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Email" required error={errors.email}>
-              <input type="email" value={values.email} onChange={(e) => set('email', e.target.value)} className={inputClass} />
+              <input name="email" type="email" value={values.email} onChange={(e) => set('email', e.target.value)} className={inputClass} />
             </Field>
             <Field label="Phone / WhatsApp">
               <input type="tel" inputMode="tel" value={values.phone} onChange={(e) => set('phone', e.target.value)} className={inputClass} />
@@ -194,14 +202,14 @@ export function RequestForm() {
         <fieldset className="space-y-3">
           <legend className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Requirement</legend>
           <Field label="What do you need?" required error={errors.requirement}>
-            <textarea value={values.requirement} onChange={(e) => set('requirement', e.target.value)} rows={3} className={inputClass} />
+            <textarea name="requirement" value={values.requirement} onChange={(e) => set('requirement', e.target.value)} rows={3} className={inputClass} />
           </Field>
         </fieldset>
 
         <fieldset className="space-y-3">
           <legend className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Target</legend>
           <Field label="What are you trying to achieve?" required error={errors.target}>
-            <input value={values.target} onChange={(e) => set('target', e.target.value)} className={inputClass} />
+            <input name="target" value={values.target} onChange={(e) => set('target', e.target.value)} className={inputClass} />
           </Field>
         </fieldset>
 

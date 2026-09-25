@@ -35,7 +35,7 @@ export function useInviteTeamMember() {
         p_community_ids: input.communityIds ?? [],
       })
       if (error) throw error
-      return data as { id: string; email: string; invite_link: string | null }
+      return data as { id: string; email: string; invite_link: string | null; invite_link_error: string | null }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['team_members'] }),
   })
@@ -46,6 +46,28 @@ export function useSetTeamMemberActive() {
   return useMutation({
     mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
       const { error } = await supabase.rpc('admin_set_team_member_active', { p_user_id: id, p_active: active })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['team_members'] }),
+  })
+}
+
+export function useUpdateTeamMember() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, fullName, phone }: { id: string; fullName: string; phone?: string }) => {
+      const { error } = await supabase.rpc('admin_update_team_member', { p_user_id: id, p_full_name: fullName, p_phone: phone || null })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['team_members'] }),
+  })
+}
+
+export function useDeleteTeamMember() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.rpc('admin_delete_team_member', { p_user_id: id })
       if (error) throw error
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['team_members'] }),

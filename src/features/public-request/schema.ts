@@ -7,7 +7,7 @@ export const requestFormSchema = z.object({
   organization: z.string().trim().optional().or(z.literal('')),
   location: z.string().trim().optional().or(z.literal('')),
   requirement: z.string().trim().min(10, 'Tell us a bit more about what you need (at least 10 characters)'),
-  target: z.string().trim().min(1, 'What are you trying to achieve?'),
+  target: z.string().trim().min(1, 'This field is required'),
   expected_output: z.string().trim().optional().or(z.literal('')),
   deadline: z.string().optional().or(z.literal('')),
   start_date: z.string().optional().or(z.literal('')),
