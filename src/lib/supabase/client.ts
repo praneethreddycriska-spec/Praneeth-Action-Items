@@ -7,6 +7,9 @@ if (!url || !anonKey) {
   throw new Error('Missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY env vars')
 }
 
-export const supabase = createClient(url, anonKey, {
+// Same-origin proxy (/sb) so ISPs that block *.supabase.co can't break the app.
+const baseUrl = typeof window !== 'undefined' ? `${window.location.origin}/sb` : url
+
+export const supabase = createClient(baseUrl, anonKey, {
   auth: { persistSession: true, autoRefreshToken: true },
 })
