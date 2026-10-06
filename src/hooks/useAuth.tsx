@@ -25,10 +25,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [adminChecked, setAdminChecked] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
-      setLoading(false)
-    })
+    const failsafe = setTimeout(() => setLoading(false), 8000)
+    supabase.auth.getSession()
+      .then(({ data }) => setSession(data.session))
+      .catch(() => {})
+      .finally(() => { clearTimeout(failsafe); setLoading(false) })
     const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
       setSession(sess)
     })
@@ -47,6 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(profileRes.data as Profile | null)
       setIsAdmin(!!adminRes.data)
       setAdminChecked(true)
+    }).catch(() => {
+      if (!cancelled) setAdminChecked(true)
     })
     return () => { cancelled = true }
   }, [session?.user])
