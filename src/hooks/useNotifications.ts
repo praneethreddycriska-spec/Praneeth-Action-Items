@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
@@ -15,10 +14,10 @@ export interface AppNotification {
 
 export function useNotifications() {
   const { user } = useAuth()
-  const qc = useQueryClient()
 
   const query = useQuery({
     queryKey: ['notifications', user?.id],
+    refetchInterval: 10000,
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -32,16 +31,6 @@ export function useNotifications() {
     },
   })
 
-  useEffect(() => {
-    if (!user) return
-    const channel = supabase
-      .channel(`notifications_${user.id}_${Math.random().toString(36).slice(2)}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${user.id}` }, () => {
-        qc.invalidateQueries({ queryKey: ['notifications', user.id] })
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [user, qc])
 
   return query
 }

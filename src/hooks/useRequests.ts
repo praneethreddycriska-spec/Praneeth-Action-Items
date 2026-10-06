@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase/client'
 import type { ActionItem, RequestRecord, RequestStatus } from '@/types'
@@ -6,10 +5,10 @@ import type { ActionItem, RequestRecord, RequestStatus } from '@/types'
 const SELECT = `*, community:communities(*), requester:requesters(*)`
 
 export function useRequests() {
-  const qc = useQueryClient()
 
   const query = useQuery({
     queryKey: ['requests'],
+    refetchInterval: 10000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('requests')
@@ -21,15 +20,6 @@ export function useRequests() {
     },
   })
 
-  useEffect(() => {
-    const channel = supabase
-      .channel('requests_realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, () => {
-        qc.invalidateQueries({ queryKey: ['requests'] })
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [qc])
 
   return query
 }

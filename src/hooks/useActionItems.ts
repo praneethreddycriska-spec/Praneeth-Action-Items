@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase/client'
 import type { ActionItem, ActionStatus, ActivityType } from '@/types'
@@ -6,10 +5,10 @@ import type { ActionItem, ActionStatus, ActivityType } from '@/types'
 const SELECT = `*, community:communities(*), owner:profiles!action_items_owner_id_fkey(*), follow_up_person:profiles!action_items_follow_up_person_id_fkey(*)`
 
 export function useActionItems() {
-  const qc = useQueryClient()
 
   const query = useQuery({
     queryKey: ['action_items'],
+    refetchInterval: 10000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('action_items')
@@ -21,15 +20,6 @@ export function useActionItems() {
     },
   })
 
-  useEffect(() => {
-    const channel = supabase
-      .channel('action_items_realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'action_items' }, () => {
-        qc.invalidateQueries({ queryKey: ['action_items'] })
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [qc])
 
   return query
 }
@@ -138,9 +128,9 @@ export function useDeleteActionItem() {
 }
 
 export function useComments(actionItemId: string | null) {
-  const qc = useQueryClient()
   const query = useQuery({
     queryKey: ['comments', actionItemId],
+    refetchInterval: 8000,
     enabled: !!actionItemId,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -153,16 +143,6 @@ export function useComments(actionItemId: string | null) {
     },
   })
 
-  useEffect(() => {
-    if (!actionItemId) return
-    const channel = supabase
-      .channel(`comments_${actionItemId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'action_item_comments', filter: `action_item_id=eq.${actionItemId}` }, () => {
-        qc.invalidateQueries({ queryKey: ['comments', actionItemId] })
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [actionItemId, qc])
 
   return query
 }
