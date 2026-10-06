@@ -36,12 +36,12 @@ export function RequestDetailDrawer({ request, onClose, onConvert }: { request: 
             <select
               value={request.status}
               onChange={(e) => update.mutate({ id: request.id, status: e.target.value as RequestStatus })}
-              className="rounded-lg border border-border bg-white/70 px-2 py-1 text-xs dark:bg-white/5"
+              className="rounded-lg border border-border bg-white/70 py-1.5 pl-3 text-xs font-medium dark:bg-white/5"
             >
               {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{REQUEST_STATUS_LABELS[s]}</option>)}
             </select>
             {request.status === 'new' || request.status === 'under_review' || request.status === 'accepted' ? (
-              <button onClick={onConvert} className="rounded-lg accent-gradient px-3 py-1 text-xs font-semibold text-white">
+              <button onClick={onConvert} className="rounded-lg accent-gradient px-3.5 py-1.5 text-xs font-semibold">
                 Convert to Action
               </button>
             ) : null}

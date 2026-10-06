@@ -51,9 +51,10 @@ export function ConvertToActionModal({ request, onClose }: { request: RequestRec
   return (
     <AnimatePresence>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] bg-black/30" onClick={onClose} />
+      <div className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 10 }}
-        className="glass-strong fixed left-1/2 top-1/2 z-[60] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-3xl p-5"
+        className="glass-strong pointer-events-auto max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-3xl p-5"
       >
         <div className="mb-3 flex items-center justify-between">
           <div>
@@ -65,7 +66,7 @@ export function ConvertToActionModal({ request, onClose }: { request: RequestRec
 
         <div className="mb-3 rounded-xl bg-secondary/50 p-2.5 text-xs">
           <p className="font-medium">Requirement</p>
-          <p className="text-muted-foreground">{request.requirement}</p>
+          <p className="max-h-32 overflow-y-auto whitespace-pre-wrap break-words text-muted-foreground">{request.requirement}</p>
           {request.target && <p className="mt-1"><span className="font-medium">Target:</span> <span className="text-muted-foreground">{request.target}</span></p>}
         </div>
 
@@ -109,6 +110,7 @@ export function ConvertToActionModal({ request, onClose }: { request: RequestRec
           {createAction.isPending ? 'Creating…' : 'Create Action Item'}
         </button>
       </motion.div>
+      </div>
     </AnimatePresence>
   )
 }
