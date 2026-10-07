@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles, Loader2, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { requestFormSchema, type RequestFormValues } from './schema'
+import { requestFormSchema, todayISO, type RequestFormValues } from './schema'
 import { submitPublicRequest } from '@/lib/supabase/requests'
 import { supabase } from '@/lib/supabase/client'
 import type { Organization } from '@/types'
@@ -80,7 +80,7 @@ export function RequestForm() {
       const res = await submitPublicRequest({
         ...parsed.data,
         deadline: parsed.data.deadline ? new Date(parsed.data.deadline).toISOString() : null,
-        start_date: parsed.data.start_date ? new Date(parsed.data.start_date).toISOString() : null,
+        start_date: new Date(todayISO()).toISOString(),
       })
       setResult(res)
     } catch (err) {
@@ -161,8 +161,8 @@ export function RequestForm() {
             <Field label="Email" required error={errors.email}>
               <input name="email" type="email" value={values.email} onChange={(e) => set('email', e.target.value)} className={inputClass} />
             </Field>
-            <Field label="Phone / WhatsApp">
-              <input type="tel" inputMode="tel" value={values.phone} onChange={(e) => set('phone', e.target.value)} className={inputClass} />
+            <Field label="Phone / WhatsApp" error={errors.phone}>
+              <input name="phone" type="tel" inputMode="numeric" maxLength={10} placeholder="10-digit mobile number" autoComplete="tel-national" value={values.phone} onChange={(e) => set('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={inputClass} />
             </Field>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -222,14 +222,10 @@ export function RequestForm() {
 
         <fieldset className="space-y-3">
           <legend className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Timeline</legend>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label="Preferred deadline">
-              <input type="date" value={values.deadline} onChange={(e) => set('deadline', e.target.value)} className={inputClass} />
-            </Field>
-            <Field label="Preferred start date">
-              <input type="date" value={values.start_date} onChange={(e) => set('start_date', e.target.value)} className={inputClass} />
-            </Field>
-          </div>
+          <Field label="Preferred deadline" error={errors.deadline}>
+            <input name="deadline" type="date" min={todayISO()} value={values.deadline} onChange={(e) => set('deadline', e.target.value)} className={inputClass} />
+          </Field>
+          <p className="text-[11px] text-muted-foreground">Work is assumed to start today ({new Date().toLocaleDateString()}).</p>
           <Field label="How urgent is this?">
             <select value={values.urgency} onChange={(e) => set('urgency', e.target.value as RequestFormValues['urgency'])} className={inputClass}>
               <option value="">Not specified</option>
