@@ -35,6 +35,24 @@
         } catch (e) {}
       })();
     </script>
+      <script>
+      // If a stale cached page points at a bundle that no longer exists, reload once to get the fresh one.
+      (function () {
+        function recover() {
+          try {
+            if (sessionStorage.getItem('chunk-reload')) return;
+            sessionStorage.setItem('chunk-reload', '1');
+          } catch (e) {}
+          location.reload();
+        }
+        window.addEventListener('error', function (e) {
+          var t = e.target;
+          if (t && t.tagName === 'SCRIPT' && /\/assets\//.test(t.src || '')) recover();
+        }, true);
+        window.addEventListener('vite:preloadError', recover);
+        window.addEventListener('load', function () { try { sessionStorage.removeItem('chunk-reload'); } catch (e) {} });
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

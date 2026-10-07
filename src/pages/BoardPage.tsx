@@ -29,7 +29,9 @@ export default function BoardPage() {
   const [groupMode, setGroupMode] = useState<GroupMode>('status')
   const [search, setSearch] = useState('')
   const [minPriority, setMinPriority] = useState(0)
-  const [selected, setSelected] = useState<ActionItem | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const selected = items.find((x) => x.id === selectedId) ?? null
+  const setSelected = (x: ActionItem | null) => setSelectedId(x?.id ?? null)
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 

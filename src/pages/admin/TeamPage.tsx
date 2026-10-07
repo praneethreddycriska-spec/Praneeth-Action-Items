@@ -16,6 +16,7 @@ export default function TeamPage() {
   const invite = useInviteTeamMember()
   const setActive = useSetTeamMemberActive()
   const resetPassword = useResetTeamMemberPassword()
+  const [isReset, setIsReset] = useState(false)
   const deleteMember = useDeleteTeamMember()
 
   const [open, setOpen] = useState(false)
@@ -85,7 +86,7 @@ export default function TeamPage() {
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold">Team Members</h1>
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => { setIsReset(false); setOpen(true) }}
           className="flex items-center gap-1 rounded-xl accent-gradient px-3 py-2 text-sm font-semibold text-white"
         ><Plus size={15} /> Add Team Member</button>
       </div>
@@ -124,9 +125,10 @@ export default function TeamPage() {
                   onClick={async () => {
                     try {
                       const link = await resetPassword.mutateAsync(m.email ?? '')
-                      await navigator.clipboard.writeText(link)
-                      toast.success('Reset link copied to clipboard')
-                    } catch { toast.error('Failed to generate reset link') }
+                      setIsReset(true); setInvitedName(m.full_name); setInvitedEmail(m.email ?? null); setInviteLink(link); setOpen(true)
+                    } catch (err) {
+                      toast.error(err instanceof Error ? err.message : 'Failed to generate reset link — wait a minute and try again')
+                    }
                   }}
                   title="Reset password"
                   className="rounded-lg bg-secondary/60 p-1.5"
@@ -148,20 +150,20 @@ export default function TeamPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" onClick={() => { setOpen(false); setInviteLink(null); setInviteLinkError(null); setInvitedName(null); setInvitedEmail(null) }}>
           <div className="glass-strong w-full max-w-sm rounded-2xl p-5" onClick={(e) => e.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-semibold">Add Team Member</h3>
+              <h3 className="text-sm font-semibold">{isReset && inviteLink ? 'Password reset link' : 'Add Team Member'}</h3>
               <button onClick={() => { setOpen(false); setInviteLink(null); setInviteLinkError(null); setInvitedName(null); setInvitedEmail(null) }}><X size={16} /></button>
             </div>
 
             {inviteLink ? (
               <div className="space-y-3">
                 <p className="text-xs text-muted-foreground">
-                  Account created. Share this one-time link so they can set their own password — we never see or store it.
+                  {isReset ? `Share this one-time link with ${invitedName ?? 'the team member'} so they can set a new password.` : 'Account created. Share this one-time link so they can set their own password — we never see or store it.'}
                 </p>
                 <div className="flex items-center gap-1.5 rounded-lg border border-border bg-white/60 p-2 text-[11px] dark:bg-white/5">
-                  <span className="flex-1 truncate">{inviteLink}</span>
-                  <button onClick={() => { navigator.clipboard.writeText(inviteLink); toast.success('Copied') }}><Copy size={13} /></button>
+                  <span className="flex-1 select-all break-all">{inviteLink}</span>
+                  <button onClick={() => { navigator.clipboard?.writeText(inviteLink).then(() => toast.success('Copied'), () => toast.error('Copy blocked — select the link and copy it manually')) }}><Copy size={13} /></button>
                 </div>
-                <button onClick={() => { setOpen(false); setInviteLink(null); setInvitedName(null); setInvitedEmail(null) }} className="w-full rounded-xl bg-primary py-2 text-sm font-semibold text-primary-foreground">Done</button>
+                <button onClick={() => { setOpen(false); setInviteLink(null); setInvitedName(null); setInvitedEmail(null); setIsReset(false) }} className="w-full rounded-xl bg-primary py-2 text-sm font-semibold text-primary-foreground">Done</button>
               </div>
             ) : invitedEmail ? (
               <div className="space-y-3">

@@ -15,7 +15,9 @@ export default function MyActionsPage() {
   const { data: items = [], isLoading } = useActionItems()
   const update = useUpdateActionItem()
   const [filter, setFilter] = useState<Filter>('assigned')
-  const [selected, setSelected] = useState<ActionItem | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const selected = items.find((x) => x.id === selectedId) ?? null
+  const setSelected = (x: ActionItem | null) => setSelectedId(x?.id ?? null)
 
   // RLS already scopes `items` to what this team member can see (assigned to them,
   // or in a community they belong to). This further narrows to "assigned to me" views.
