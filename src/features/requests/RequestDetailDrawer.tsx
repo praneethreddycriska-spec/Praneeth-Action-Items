@@ -80,6 +80,7 @@ export function RequestDetailDrawer({ request, onClose, onConvert }: { request: 
           <section>
             <h4 className="mb-1.5 text-xs font-semibold uppercase text-muted-foreground">Timeline</h4>
             <p className="text-sm">Submitted: {format(new Date(request.created_at), 'MMM d, yyyy HH:mm')}</p>
+            {request.start_date && <p className="text-sm">Start: {format(new Date(request.start_date), 'MMM d, yyyy')}</p>}
             {request.deadline && <p className="text-sm">Deadline: {format(new Date(request.deadline), 'MMM d, yyyy')}</p>}
           </section>
 

@@ -52,7 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!cancelled) setAdminChecked(true)
     })
     return () => { cancelled = true }
-  }, [session?.user])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id])
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password })

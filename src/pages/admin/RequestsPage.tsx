@@ -26,7 +26,9 @@ export default function RequestsPage() {
   const { data: requests = [], isLoading } = useRequests()
   const [tab, setTab] = useState<RequestStatus | 'all'>('all')
   const [search, setSearch] = useState('')
-  const [selected, setSelected] = useState<RequestRecord | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const selected = requests.find((r) => r.id === selectedId) ?? null
+  const setSelected = (r: RequestRecord | null) => setSelectedId(r?.id ?? null)
   const [converting, setConverting] = useState<RequestRecord | null>(null)
 
   const filtered = useMemo(() => {
