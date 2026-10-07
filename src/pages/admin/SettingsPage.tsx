@@ -13,7 +13,10 @@ export default function SettingsPage() {
   const toggle = () => {
     setSetting.mutate(
       { key: 'auto_approval_enabled', value: !autoApproval },
-      { onSuccess: () => toast.success(`Auto approval turned ${!autoApproval ? 'ON' : 'OFF'}`) },
+      {
+        onSuccess: () => toast.success(`Auto approval turned ${!autoApproval ? 'ON' : 'OFF'}`),
+        onError: () => toast.error('Could not save the setting — please try again'),
+      },
     )
   }
 
@@ -100,7 +103,7 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={toggle}
-              disabled={isLoading || setSetting.isPending}
+              disabled={isLoading}
               aria-pressed={autoApproval}
               className={`relative inline-flex h-8 w-16 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${autoApproval ? 'bg-emerald-500' : 'bg-secondary'}`}
             >

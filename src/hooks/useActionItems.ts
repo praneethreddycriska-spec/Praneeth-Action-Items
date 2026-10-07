@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase/client'
+import { supabase, getCurrentUser } from '@/lib/supabase/client'
 import type { ActionItem, ActionStatus, ActivityType } from '@/types'
 
 const SELECT = `*, community:communities(*), owner:profiles!action_items_owner_id_fkey(*), follow_up_person:profiles!action_items_follow_up_person_id_fkey(*)`
@@ -25,7 +25,7 @@ export function useActionItems() {
 }
 
 async function logActivity(actionItemId: string, type: ActivityType, detail?: string) {
-  const { data: userData } = await supabase.auth.getUser()
+  const { data: userData } = await getCurrentUser()
   await supabase.from('action_item_activity').insert({
     action_item_id: actionItemId,
     actor_id: userData.user?.id ?? null,
@@ -38,7 +38,7 @@ export function useCreateActionItem() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (input: Partial<ActionItem> & { title: string }) => {
-      const { data: userData } = await supabase.auth.getUser()
+      const { data: userData } = await getCurrentUser()
       const { data, error } = await supabase
         .from('action_items')
         .insert({
@@ -151,7 +151,7 @@ export function useAddComment() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ actionItemId, body }: { actionItemId: string; body: string }) => {
-      const { data: userData } = await supabase.auth.getUser()
+      const { data: userData } = await getCurrentUser()
       const { error } = await supabase.from('action_item_comments').insert({
         action_item_id: actionItemId, author_id: userData.user?.id, body,
       })

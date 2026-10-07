@@ -13,3 +13,8 @@ const baseUrl = typeof window !== 'undefined' ? `${window.location.origin}/sb` :
 export const supabase = createClient(baseUrl, anonKey, {
   auth: { persistSession: true, autoRefreshToken: true },
 })
+
+// Reads the user from the locally stored session (no network round trip, unlike auth.getUser()).
+export const getCurrentUser = async () => ({
+  data: { user: (await supabase.auth.getSession()).data.session?.user ?? null },
+})

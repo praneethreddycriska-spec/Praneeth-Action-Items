@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase/client'
+import { supabase, getCurrentUser } from '@/lib/supabase/client'
 import type { Organization } from '@/types'
 
 export function useOrganizations() {
@@ -17,7 +17,7 @@ export function useCreateOrganization() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (name: string) => {
-      const { data: userData } = await supabase.auth.getUser()
+      const { data: userData } = await getCurrentUser()
       const { data, error } = await supabase
         .from('organizations')
         .insert({ name: name.trim(), created_by: userData.user?.id })

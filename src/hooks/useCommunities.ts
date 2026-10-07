@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase/client'
+import { supabase, getCurrentUser } from '@/lib/supabase/client'
 import type { Community } from '@/types'
 
 export function useCommunities() {
@@ -21,7 +21,7 @@ export function useCreateCommunity() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (input: { name: string; description?: string; color?: string; icon?: string }) => {
-      const { data: userData } = await supabase.auth.getUser()
+      const { data: userData } = await getCurrentUser()
       const { data, error } = await supabase
         .from('communities')
         .insert({ ...input, created_by: userData.user?.id })
