@@ -6,10 +6,10 @@ import { cn } from '@/lib/utils'
 import { getDeadlineState, DEADLINE_STYLES, formatSmartDate } from '@/utils/deadline'
 import { PriorityStars } from '@/components/PriorityStars'
 
-export function ActionCard({ item, onOpen, onComplete }: { item: ActionItem; onOpen: () => void; onComplete: () => void }) {
+export function ActionCard({ item, index = 0, onOpen, onComplete }: { item: ActionItem; index?: number; onOpen: () => void; onComplete: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
   const deadlineState = getDeadlineState(item)
-  const style = { transform: CSS.Transform.toString(transform), transition }
+  const style = { transform: CSS.Transform.toString(transform), transition, animationDelay: `${Math.min(index, 8) * 45}ms` }
 
   return (
     <div
@@ -19,8 +19,8 @@ export function ActionCard({ item, onOpen, onComplete }: { item: ActionItem; onO
       {...listeners}
       onClick={onOpen}
       className={cn(
-        'glass group cursor-pointer rounded-2xl p-3 transition-shadow hover:shadow-lg',
-        isDragging && 'opacity-50',
+        'glass lift-soft animate-fade-up group cursor-pointer rounded-3xl p-3.5',
+        isDragging && 'scale-[1.02] opacity-60 shadow-2xl',
         item.priority >= 10 && 'ring-1 ring-red-500/40',
       )}
     >

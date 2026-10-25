@@ -3,24 +3,28 @@
 @tailwind utilities;
 
 :root {
-  --background: 220 25% 98%;
+  --background: 250 45% 97.5%;
   --foreground: 222 30% 14%;
   --card: 0 0% 100%;
   --card-foreground: 222 30% 14%;
   --primary: 250 84% 60%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 210 40% 94%;
+  --secondary: 250 40% 94%;
   --secondary-foreground: 222 30% 20%;
-  --muted: 214 30% 92%;
+  --muted: 250 30% 93%;
   --muted-foreground: 220 12% 45%;
   --accent: 280 70% 60%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 75% 58%;
   --destructive-foreground: 0 0% 100%;
-  --border: 220 20% 88%;
+  --border: 250 22% 90%;
   --input: 220 20% 88%;
   --ring: 250 84% 60%;
   --radius: 1.1rem;
+  --tone-mint: 160 65% 92%;
+  --tone-peach: 24 95% 92%;
+  --tone-sky: 200 90% 92%;
+  --tone-rose: 345 90% 94%;
 }
 
 .dark {
@@ -41,6 +45,10 @@
   --border: 228 18% 22%;
   --input: 228 18% 22%;
   --ring: 255 92% 70%;
+  --tone-mint: 160 40% 18%;
+  --tone-peach: 24 45% 20%;
+  --tone-sky: 200 50% 20%;
+  --tone-rose: 345 45% 21%;
 }
 
 * { border-color: hsl(var(--border)); }
@@ -48,37 +56,87 @@
 body {
   @apply bg-background text-foreground antialiased;
   background-image:
-    radial-gradient(circle at 12% 8%, hsl(255 85% 80% / 0.12), transparent 40%),
-    radial-gradient(circle at 88% 12%, hsl(200 85% 75% / 0.10), transparent 45%),
-    radial-gradient(circle at 50% 100%, hsl(230 40% 90% / 0.06), transparent 55%);
+    radial-gradient(circle at 10% 0%, hsl(var(--primary) / 0.10), transparent 42%),
+    radial-gradient(circle at 95% 8%, hsl(var(--accent) / 0.08), transparent 40%);
   background-attachment: fixed;
   font-feature-settings: 'ss01', 'cv01';
 }
 
 .glass {
-  background: linear-gradient(135deg, hsl(0 0% 100% / 0.55), hsl(0 0% 100% / 0.18));
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid hsl(0 0% 100% / 0.4);
-  box-shadow: 0 8px 32px -8px hsl(230 40% 20% / 0.15), inset 0 1px 0 hsl(0 0% 100% / 0.5);
+  background: hsl(0 0% 100% / 0.86);
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid hsl(var(--primary) / 0.10);
+  box-shadow: 0 1px 2px hsl(var(--primary) / 0.06), 0 14px 34px -14px hsl(var(--primary) / 0.22);
 }
 
 .dark .glass {
-  background: linear-gradient(135deg, hsl(230 30% 22% / 0.55), hsl(230 30% 14% / 0.35));
-  border: 1px solid hsl(0 0% 100% / 0.08);
-  box-shadow: 0 8px 32px -8px hsl(0 0% 0% / 0.5), inset 0 1px 0 hsl(0 0% 100% / 0.06);
+  background: hsl(228 26% 13% / 0.82);
+  border: 1px solid hsl(0 0% 100% / 0.07);
+  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.4), 0 16px 36px -14px hsl(0 0% 0% / 0.6);
 }
 
 .glass-strong {
-  background: linear-gradient(135deg, hsl(0 0% 100% / 0.75), hsl(0 0% 100% / 0.35));
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid hsl(0 0% 100% / 0.55);
+  background: hsl(0 0% 100% / 0.94);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid hsl(var(--primary) / 0.12);
+  box-shadow: 0 24px 60px -20px hsl(var(--primary) / 0.35);
 }
 
 .dark .glass-strong {
-  background: linear-gradient(135deg, hsl(230 30% 24% / 0.75), hsl(230 30% 16% / 0.5));
-  border: 1px solid hsl(0 0% 100% / 0.1);
+  background: hsl(228 26% 14% / 0.94);
+  border: 1px solid hsl(0 0% 100% / 0.09);
+}
+
+/* Interactive cards: lift on hover, press on tap */
+.lift {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+}
+.lift:hover { transform: translateY(-3px); box-shadow: 0 2px 4px hsl(var(--primary) / 0.08), 0 22px 44px -16px hsl(var(--primary) / 0.35); }
+.lift:active { transform: translateY(-1px) scale(0.99); }
+
+/* Pastel bento tiles (follow the accent color for the lilac tone) */
+.tone-lilac { background: hsl(var(--primary) / 0.13); }
+.tone-mint { background: hsl(var(--tone-mint)); }
+.tone-peach { background: hsl(var(--tone-peach)); }
+.tone-sky { background: hsl(var(--tone-sky)); }
+.tone-rose { background: hsl(var(--tone-rose)); }
+.tone-lilac, .tone-mint, .tone-peach, .tone-sky, .tone-rose {
+  border: 1px solid hsl(0 0% 100% / 0.6);
+  box-shadow: 0 10px 28px -16px hsl(var(--primary) / 0.28);
+}
+.dark .tone-lilac, .dark .tone-mint, .dark .tone-peach, .dark .tone-sky, .dark .tone-rose { border-color: hsl(0 0% 100% / 0.07); }
+
+/* Hero banner: soft gradient + floating blobs like a dashboard welcome card */
+.hero-card {
+  position: relative; overflow: hidden;
+  background: linear-gradient(120deg, hsl(var(--primary) / 0.22), hsl(var(--accent) / 0.16) 60%, hsl(var(--primary) / 0.08));
+  border: 1px solid hsl(var(--primary) / 0.16);
+}
+.hero-card::before, .hero-card::after {
+  content: ''; position: absolute; border-radius: 9999px; filter: blur(8px); pointer-events: none;
+  animation: float 9s ease-in-out infinite;
+}
+.hero-card::before { width: 220px; height: 220px; right: -50px; top: -80px; background: radial-gradient(circle at 30% 30%, hsl(var(--accent) / 0.55), hsl(var(--primary) / 0.15) 65%, transparent 70%); }
+.hero-card::after { width: 140px; height: 140px; right: 120px; bottom: -70px; background: radial-gradient(circle, hsl(var(--primary) / 0.35), transparent 70%); animation-delay: -4s; }
+
+@keyframes float { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-10px, 12px, 0) scale(1.06); } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes pop { 0% { transform: scale(0.85); opacity: 0; } 60% { transform: scale(1.04); } 100% { transform: scale(1); opacity: 1; } }
+
+.animate-fade-up { animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.animate-pop { animation: pop 0.35s ease-out backwards; }
+.lift-soft { transition: box-shadow 0.25s ease, border-color 0.25s ease; }
+.lift-soft:hover { border-color: hsl(var(--primary) / 0.3); box-shadow: 0 2px 4px hsl(var(--primary) / 0.08), 0 20px 40px -16px hsl(var(--primary) / 0.4); }
+.skeleton {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--secondary)) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s linear infinite; border-radius: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
 /* Primary CTA gradient — follows the user's chosen accent color (Settings →

@@ -3,6 +3,7 @@ import { Search } from 'lucide-react'
 import type { RequestRecord, RequestStatus } from '@/types'
 import { REQUEST_STATUS_LABELS } from '@/types'
 import { useRequests } from '@/hooks/useRequests'
+import { Skeleton } from '@/components/motion'
 import { RequestDetailDrawer } from '@/features/requests/RequestDetailDrawer'
 import { ConvertToActionModal } from '@/features/requests/ConvertToActionModal'
 import { cn } from '@/lib/utils'
@@ -83,11 +84,11 @@ export default function RequestsPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading requests…</p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">{[0, 1, 2].map((n) => <Skeleton key={n} className="h-36" />)}</div>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((r) => (
-            <button key={r.id} onClick={() => setSelected(r)} className="glass rounded-2xl p-3.5 text-left">
+            <button key={r.id} onClick={() => setSelected(r)} className="glass lift animate-fade-up rounded-3xl p-4 text-left">
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="text-[10px] font-medium uppercase text-muted-foreground">{r.request_code}</span>
                 <span className={cn('rounded-full px-2 py-0.5 text-[10px] font-semibold', STATUS_TONE[r.status])}>{REQUEST_STATUS_LABELS[r.status]}</span>

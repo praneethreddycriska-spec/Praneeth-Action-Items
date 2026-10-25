@@ -1,5 +1,6 @@
 import { type ReactNode, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { LayoutGrid, Users, BarChart3, Sparkles, LogOut, Menu, X, Inbox, UserCog, Settings, MoreHorizontal, ListChecks } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
@@ -24,6 +25,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const NAV = isAdmin ? ADMIN_NAV : TEAM_NAV
   const MOBILE_PRIMARY = isAdmin ? ['/admin', '/admin/requests'] : ['/team']
@@ -33,46 +35,53 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <div className="flex h-[100dvh] w-full overflow-hidden">
       <aside
         className={cn(
-          'glass z-40 flex w-64 shrink-0 flex-col gap-1 rounded-r-3xl p-4 transition-transform md:static md:translate-x-0',
+          'glass z-40 flex w-64 shrink-0 flex-col gap-1 rounded-r-[2rem] p-4 transition-transform md:static md:m-3 md:w-[88px] md:translate-x-0 md:items-center md:rounded-[2rem] md:px-2 md:py-4',
           'fixed inset-y-0 left-0',
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        <div className="mb-6 flex items-center gap-2 px-2">
+        <div className="mb-6 flex items-center gap-2 px-2 md:mb-5 md:px-0">
           <div className="flex h-9 w-9 items-center justify-center rounded-2xl accent-gradient shadow-lg">
             <Sparkles size={18} />
           </div>
-          <span className="text-base font-semibold">Action Items</span>
+          <span className="text-base font-semibold md:hidden">Action Items</span>
           <button className="ml-auto md:hidden" onClick={() => setMobileOpen(false)} aria-label="Close menu"><X size={18} /></button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-1">
-          {NAV.map(({ to, label, icon: Icon, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              onClick={() => setMobileOpen(false)}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-all',
-                  isActive
-                    ? 'bg-white/80 text-primary shadow-sm dark:bg-white/10'
-                    : 'text-muted-foreground hover:bg-white/40 dark:hover:bg-white/5',
-                )
-              }
-            >
-              <Icon size={17} />
-              {label}
-            </NavLink>
-          ))}
+        <nav className="flex w-full flex-1 flex-col gap-1.5">
+          {NAV.map(({ to, label, icon: Icon, end }) => {
+            const active = end ? location.pathname === to : location.pathname.startsWith(to)
+            return (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                title={label}
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  'group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors md:flex-col md:gap-1 md:px-1 md:py-2 md:text-[10px]',
+                  active ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="nav-active"
+                    className="absolute inset-0 -z-0 rounded-2xl bg-primary/12 ring-1 ring-primary/20"
+                    transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                  />
+                )}
+                <span className="relative z-10 transition-transform duration-200 group-hover:scale-110 group-active:scale-95"><Icon size={19} /></span>
+                <span className="relative z-10">{label}</span>
+              </NavLink>
+            )
+          })}
         </nav>
 
-        <div className="mt-auto flex items-center gap-2 rounded-2xl bg-white/50 p-2.5 dark:bg-white/5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-violet-500 text-xs font-semibold text-white">
+        <div className="mt-auto flex w-full items-center gap-2 rounded-2xl bg-primary/8 p-2.5 md:flex-col md:gap-1.5 md:p-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full accent-gradient text-xs font-semibold">
             {(profile?.full_name ?? profile?.email ?? '?').slice(0, 1).toUpperCase()}
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 md:hidden">
             <p className="truncate text-xs font-medium">{profile?.full_name ?? profile?.email}</p>
           </div>
           <button onClick={signOut} className="shrink-0 p-1 text-muted-foreground hover:text-destructive" title="Sign out" aria-label="Sign out">
@@ -93,7 +102,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-hidden pb-16 md:pb-0">{children}</div>
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="min-h-0 flex-1 overflow-hidden pb-16 md:pb-0"
+        >
+          {children}
+        </motion.div>
       </main>
 
       {/* Mobile bottom navigation */}

@@ -8,6 +8,7 @@ import { useCommunities } from '@/hooks/useCommunities'
 import { BoardColumn } from '@/features/actions/BoardColumn'
 import { BoardControls } from '@/features/actions/BoardControls'
 import { QuickCreate } from '@/features/actions/QuickCreate'
+import { Skeleton } from '@/components/motion'
 import { ActionDetailDrawer } from '@/features/actions/ActionDetailDrawer'
 import { getDeadlineState, sortByUrgency, daysOverdue } from '@/utils/deadline'
 import { PriorityStars } from '@/components/PriorityStars'
@@ -137,7 +138,7 @@ export default function BoardPage() {
       )}
 
       {isLoading ? (
-        <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">Loading board…</div>
+        <div className="flex flex-1 gap-3 overflow-hidden">{[0, 1, 2].map((n) => <Skeleton key={n} className="h-72 w-72 shrink-0" />)}</div>
       ) : (
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <div className="flex flex-1 gap-3 overflow-x-auto pb-2">
