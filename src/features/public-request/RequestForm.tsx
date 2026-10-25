@@ -30,7 +30,7 @@ export function RequestForm() {
   const [orgOther, setOrgOther] = useState('')
 
   useEffect(() => {
-    supabase.from('organizations').select('*').order('name').then(({ data }) => {
+    supabase.rpc('list_public_organizations').then(({ data }) => {
       if (data) setOrganizations(data as Organization[])
     })
   }, [])

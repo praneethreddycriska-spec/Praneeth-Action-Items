@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Plus, Archive, Trash2, Building2 } from 'lucide-react'
+import { Plus, Archive } from 'lucide-react'
 import { useCommunities, useCreateCommunity, useArchiveCommunity } from '@/hooks/useCommunities'
-import { useOrganizations, useCreateOrganization, useDeleteOrganization } from '@/hooks/useOrganizations'
 import { useActionItems } from '@/hooks/useActionItems'
 import { getDeadlineState } from '@/utils/deadline'
 import { toast } from 'sonner'
@@ -16,19 +15,14 @@ export default function CommunitiesPage() {
   const [name, setName] = useState('')
   const [color, setColor] = useState(COLORS[0])
 
-  const { data: organizations = [] } = useOrganizations()
-  const createOrg = useCreateOrganization()
-  const deleteOrg = useDeleteOrganization()
-  const [orgName, setOrgName] = useState('')
-
-  const submitOrg = () => {
-    const trimmed = orgName.trim()
+  const submitCommunity = () => {
+    const trimmed = name.trim()
     if (!trimmed) return
-    if (organizations.some((o) => o.name.toLowerCase() === trimmed.toLowerCase())) {
-      toast.error('That organization already exists')
+    if (communities.some((c) => c.name.toLowerCase() === trimmed.toLowerCase())) {
+      toast.error('That community / organization already exists')
       return
     }
-    createOrg.mutate(trimmed, { onSuccess: () => setOrgName('') })
+    create.mutate({ name: trimmed, color }, { onSuccess: () => setName('') })
   }
 
   const stats = useMemo(() => {
@@ -48,12 +42,15 @@ export default function CommunitiesPage() {
   return (
     <div className="h-full overflow-y-auto p-4">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Communities</h1>
+        <div>
+          <h1 className="text-lg font-semibold">Communities &amp; Organizations</h1>
+          <p className="text-xs text-muted-foreground">Each one is both a community on the board and a selectable organization on the public request form.</p>
+        </div>
       </div>
 
       <div className="glass mb-5 flex flex-wrap items-center gap-2 rounded-2xl p-3">
         <input
-          value={name} onChange={(e) => setName(e.target.value)} placeholder="New community name…"
+          value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') submitCommunity() }} placeholder="New community / organization name…"
           className="min-w-[180px] flex-1 rounded-xl border border-border bg-white/70 px-3 py-2 text-sm outline-none dark:bg-white/5"
         />
         <div className="flex gap-1">
@@ -62,8 +59,9 @@ export default function CommunitiesPage() {
           ))}
         </div>
         <button
-          onClick={() => { if (name.trim()) { create.mutate({ name: name.trim(), color }); setName('') } }}
-          className="flex items-center gap-1 rounded-xl accent-gradient px-3 py-2 text-sm font-semibold text-white"
+          onClick={submitCommunity}
+          disabled={!name.trim() || create.isPending}
+          className="flex items-center gap-1 rounded-xl accent-gradient px-3 py-2 text-sm font-semibold disabled:opacity-50"
         ><Plus size={15} /> Create</button>
       </div>
 
@@ -93,40 +91,7 @@ export default function CommunitiesPage() {
             </div>
           )
         })}
-        {communities.length === 0 && <p className="text-sm text-muted-foreground">No communities yet — create one above.</p>}
-      </div>
-
-      <div className="mb-3 mt-8 flex items-center gap-2">
-        <Building2 size={16} className="text-muted-foreground" />
-        <h2 className="text-base font-semibold">Organizations / Companies</h2>
-      </div>
-      <p className="mb-3 text-xs text-muted-foreground">
-        Organizations added here appear as selectable options on the public request form.
-      </p>
-
-      <div className="glass mb-4 flex flex-wrap items-center gap-2 rounded-2xl p-3">
-        <input
-          value={orgName}
-          onChange={(e) => setOrgName(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') submitOrg() }}
-          placeholder="New organization / company name…"
-          className="min-w-[180px] flex-1 rounded-xl border border-border bg-white/70 px-3 py-2 text-sm outline-none dark:bg-white/5"
-        />
-        <button
-          onClick={submitOrg}
-          disabled={!orgName.trim() || createOrg.isPending}
-          className="flex items-center gap-1 rounded-xl accent-gradient px-3 py-2 text-sm font-semibold disabled:opacity-50"
-        ><Plus size={15} /> Add</button>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        {organizations.map((o) => (
-          <span key={o.id} className="glass flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium">
-            {o.name}
-            <button onClick={() => deleteOrg.mutate(o.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={12} /></button>
-          </span>
-        ))}
-        {organizations.length === 0 && <p className="text-sm text-muted-foreground">No organizations yet — add one above.</p>}
+        {communities.length === 0 && <p className="text-sm text-muted-foreground">No communities yet — add one above.</p>}
       </div>
     </div>
   )
