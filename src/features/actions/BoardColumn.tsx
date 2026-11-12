@@ -27,7 +27,7 @@ export function BoardColumn({
   const overdue = items.filter((i) => getDeadlineState(i) === 'overdue').length
 
   return (
-    <div className="flex h-full w-[272px] shrink-0 flex-col">
+    <div className="flex h-full w-[82vw] max-w-[300px] shrink-0 snap-start flex-col sm:w-[272px]">
       <div className="mb-2.5 flex items-center gap-2 px-1">
         <span className={cn('h-2.5 w-2.5 rounded-full ring-2 ring-white/20', DOT[tone])} />
         <div className="min-w-0 flex-1">

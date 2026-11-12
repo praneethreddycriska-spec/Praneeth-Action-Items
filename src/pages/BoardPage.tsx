@@ -32,11 +32,11 @@ const TONES: Tone[] = ['blue', 'olive', 'rust', 'slate']
 
 function StatChip({ icon: Icon, value, label }: { icon: typeof Layers; value: number; label: string }) {
   return (
-    <div className="flex items-center gap-2.5">
-      <span className="glass flex h-10 w-10 items-center justify-center rounded-full"><Icon size={16} /></span>
-      <div>
+    <div className="flex items-center gap-2 md:gap-2.5">
+      <span className="glass flex h-9 w-9 shrink-0 items-center justify-center rounded-full md:h-10 md:w-10"><Icon size={15} /></span>
+      <div className="min-w-0">
         <CountUp value={value} className="block text-lg font-semibold leading-none" />
-        <span className="text-[11px] text-muted-foreground">{label}</span>
+        <span className="block text-[10px] leading-tight text-muted-foreground md:text-[11px]">{label}</span>
       </div>
     </div>
   )
@@ -137,7 +137,7 @@ export default function BoardPage() {
       const byId = new Map(communities.map((c) => [c.id, c]))
       const ids = Array.from(new Set(filtered.map((i) => i.community_id ?? 'ungrouped')))
       return ids.map((id) => ({
-        key: id, label: id === 'ungrouped' ? 'Ungrouped' : byId.get(id)?.name ?? 'Unknown',
+        key: id, label: id === 'ungrouped' ? 'Ungrouped' : byId.get(id)?.name ?? filtered.find((i) => i.community_id === id)?.community?.name ?? 'Unknown',
         items: filtered.filter((i) => (i.community_id ?? 'ungrouped') === id),
         tone: undefined,
       }))
@@ -184,18 +184,18 @@ export default function BoardPage() {
   return (
     <div className="relative flex h-full flex-col px-3 pb-3 md:px-6">
       <div className="mb-4 flex flex-wrap items-center gap-x-7 gap-y-3">
-        <div>
-          <h1 className="text-[30px] font-light leading-[1.02] tracking-tight md:text-[38px]">
+        <div className="order-1 min-w-0 flex-1 md:flex-none">
+          <h1 className="text-[28px] font-light leading-[1.02] tracking-tight md:text-[38px]">
             Action <br className="hidden md:block" />Pipeline
           </h1>
           <p className="mt-1 text-[11px] text-muted-foreground">{format(new Date(), 'EEEE, MMM d yyyy')}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div className="order-3 grid w-full grid-cols-3 gap-2 md:order-2 md:flex md:w-auto md:items-center md:gap-x-6">
           <StatChip icon={Layers} value={stats.open} label="Open actions" />
           <StatChip icon={AlarmClock} value={stats.overdue} label="Overdue" />
           <StatChip icon={CheckCircle2} value={stats.doneMonth} label="Done this month" />
         </div>
-        <div className="ml-auto"><QuickCreate /></div>
+        <div className="order-2 md:order-3 md:ml-auto"><QuickCreate /></div>
       </div>
 
       <div className="mb-4">
@@ -234,16 +234,18 @@ export default function BoardPage() {
         <div className="min-h-0 flex-1 overflow-y-auto"><ListView items={sortByUrgency(filtered)} onOpen={setSelected} /></div>
       ) : (
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-          <div className="flex min-h-0 flex-1 gap-4 overflow-x-auto pb-2">
-            {groups.map((g, idx) => (
-              <BoardColumn
-                key={g.key} id={g.key} title={g.label} items={g.items}
-                tone={g.tone ?? TONES[idx % TONES.length]}
-                onOpen={setSelected}
-                onComplete={(i) => update.mutate({ id: i.id, status: 'completed' })}
-                onAdd={groupMode === 'status' ? () => navigate(`/admin?new=1&status=${g.key}`) : undefined}
-              />
-            ))}
+          <div className="flex min-h-0 flex-1 gap-4">
+            <div className="flex min-w-0 flex-1 snap-x snap-mandatory gap-4 overflow-x-auto pb-2 md:snap-none">
+              {groups.map((g, idx) => (
+                <BoardColumn
+                  key={g.key} id={g.key} title={g.label} items={g.items}
+                  tone={g.tone ?? TONES[idx % TONES.length]}
+                  onOpen={setSelected}
+                  onComplete={(i) => update.mutate({ id: i.id, status: 'completed' })}
+                  onAdd={groupMode === 'status' ? () => navigate(`/admin?new=1&status=${g.key}`) : undefined}
+                />
+              ))}
+            </div>
             {groupMode === 'status' && <DoneTile count={stats.doneTotal} open={showDone} onToggle={() => setShowDone((v) => !v)} />}
           </div>
         </DndContext>
