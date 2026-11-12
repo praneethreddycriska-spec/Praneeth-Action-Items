@@ -208,27 +208,21 @@ export default function BoardPage() {
       </div>
 
       {overdueItems.length > 0 && view === 'board' && (
-        <div className="mb-3 rounded-[1.6rem] border border-red-400/25 bg-red-500/10 p-3">
-          <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-red-400">
+        <div className="mb-3 flex items-center gap-2 rounded-full border border-red-400/25 bg-red-500/10 py-1.5 pl-3.5 pr-1.5">
+          <span className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-red-400">
             <span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Overdue ({overdueItems.length})
-          </h3>
-          <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
+          </span>
+          <div className="no-scrollbar flex min-w-0 flex-1 gap-1.5 overflow-x-auto">
             {overdueItems.map((i) => (
-              <div
+              <button
                 key={i.id}
-                role="button"
-                tabIndex={0}
                 onClick={() => setSelected(i)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelected(i) }}
-                className="glass lift flex min-w-[230px] shrink-0 cursor-pointer flex-col gap-1 rounded-2xl p-3 text-left"
+                className="glass flex shrink-0 items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium transition-transform active:scale-95"
+                title={i.title}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-semibold text-red-400">{daysOverdue(i)}d overdue</span>
-                  <span className="text-[10px] text-muted-foreground">P{i.priority}</span>
-                </div>
-                <p className="truncate text-xs font-semibold">{i.title}</p>
-                <p className="truncate text-[10px] text-muted-foreground">{i.community?.name ?? 'No community'} {i.follow_up_person ? `· ${i.follow_up_person.full_name}` : ''}</p>
-              </div>
+                <span className="font-semibold text-red-400">{daysOverdue(i)}d</span>
+                <span className="max-w-[160px] truncate">{i.title}</span>
+              </button>
             ))}
           </div>
         </div>

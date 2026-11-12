@@ -35,7 +35,7 @@ function Donut({ data }: { data: { label: string; value: number }[] }) {
   const c = 2 * Math.PI * r
   let offset = 0
   return (
-    <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
+    <div className="flex flex-col items-center gap-5">
       <div className="relative h-36 w-36 shrink-0">
         <svg viewBox="0 0 120 120" className="-rotate-90">
           <circle cx="60" cy="60" r={r} fill="none" stroke="hsl(var(--foreground) / 0.08)" strokeWidth="12" />
@@ -57,7 +57,7 @@ function Donut({ data }: { data: { label: string; value: number }[] }) {
           <span className="mt-0.5 text-[10px] text-muted-foreground">requests</span>
         </div>
       </div>
-      <ul className="grid flex-1 grid-cols-1 gap-x-5 gap-y-1.5 text-xs">
+      <ul className="grid w-full grid-cols-1 gap-y-2 text-xs">
         {data.map((d, i) => (
           <li key={d.label} className="flex items-center gap-2">
             <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: DONUT[i % DONUT.length] }} />

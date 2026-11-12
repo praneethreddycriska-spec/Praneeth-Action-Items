@@ -110,7 +110,7 @@ export function QuickCreate() {
         <div className="mb-3 flex gap-2">
           <button
             onClick={() => voice.listening ? voice.stop() : voice.start((text) => setTitle(text))}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border py-2 text-xs font-medium transition-colors ${voice.listening ? 'border-primary bg-primary/15 text-ink' : 'border-border bg-white/50 '}`}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl border py-2 text-xs font-medium transition-colors ${voice.listening ? 'border-primary bg-primary/15 text-ink' : 'border-border bg-foreground/5 '}`}
           >
             <Mic size={14} /> {voice.listening ? 'Listening…' : 'Voice Note'}
           </button>
@@ -163,7 +163,7 @@ export function QuickCreate() {
             onChange={(e) => setDeadline(e.target.value)}
             className="w-full rounded-xl border border-border bg-foreground/5 px-3 py-2 text-xs "
           />
-          <div className="flex items-center justify-between rounded-xl border border-border bg-white/50 px-3 py-2 ">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-foreground/5 px-3 py-2 ">
             <span className="text-xs text-muted-foreground">Priority</span>
             <PriorityStars value={priority} onChange={setPriority} />
           </div>

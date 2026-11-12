@@ -109,7 +109,7 @@ export default function DashboardPage() {
   const funnelMax = Math.max(requestKpis.total, 1)
 
   return (
-    <div className="h-full overflow-y-auto p-4 md:p-6">
+    <div className="h-full overflow-y-auto px-3 pb-8 md:px-6">
       <FadeUp>
         <div className="hero-card mb-5 rounded-[2rem] p-5 md:p-7">
           <div className="relative z-10 max-w-xl">
@@ -123,7 +123,7 @@ export default function DashboardPage() {
         </div>
       </FadeUp>
 
-      <Stagger className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <Stagger className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-5">
         <StatTile label="Total requests" value={requestKpis.total} tone="lilac" icon={Inbox} hint={`${requestKpis.thisWeek} this week`} />
         <StatTile label="New requests" value={requestKpis.newCount} tone="sky" icon={Layers} hint="Awaiting review" />
         <StatTile label="Converted" value={requestKpis.converted} tone="mint" icon={CheckCircle2} hint="Became action items" />
@@ -132,14 +132,9 @@ export default function DashboardPage() {
         <StatTile label="Due today" value={kpis.dueToday} tone="peach" icon={CalendarClock} hint={`${kpis.dueWeek} due this week`} />
         <StatTile label="Critical" value={kpis.critical} tone="rose" icon={Flame} />
         <StatTile label="Completed today" value={kpis.completedToday} tone="mint" icon={CheckCircle2} />
+        <StatTile label="Unassigned" value={kpis.unassigned} tone="peach" icon={UserX} hint="No follow-up person" />
+        <StatTile label="Waiting" value={kpis.waiting} tone="sky" icon={Hourglass} hint="Blocked on others" />
       </Stagger>
-
-      <div className="mb-5 grid grid-cols-2 gap-3 md:grid-cols-2">
-        <Stagger className="contents">
-          <StatTile label="Unassigned" value={kpis.unassigned} tone="peach" icon={UserX} hint="No follow-up person" />
-          <StatTile label="Waiting" value={kpis.waiting} tone="sky" icon={Hourglass} hint="Blocked on others" />
-        </Stagger>
-      </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <FadeUp delay={0.15} className="lg:col-span-1">

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Plus, Copy, Power, KeyRound, X, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Copy, Power, KeyRound, X, Pencil, Trash2, Users2, UserCheck, AlarmClock } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   useTeamMembers, useInviteTeamMember, useSetTeamMemberActive, useResetTeamMemberPassword,
@@ -9,6 +9,8 @@ import { useCommunities } from '@/hooks/useCommunities'
 import { useActionItems } from '@/hooks/useActionItems'
 import { getDeadlineState } from '@/utils/deadline'
 import type { Profile } from '@/types'
+import { Avatar } from '@/components/Avatar'
+import { CountUp } from '@/components/motion'
 
 export default function TeamPage() {
   const { data: members = [] } = useTeamMembers()
@@ -82,45 +84,59 @@ export default function TeamPage() {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Team Members</h1>
+    <div className="h-full overflow-y-auto px-3 pb-8 md:px-6">
+      <div className="mb-5 flex flex-wrap items-center gap-x-7 gap-y-3">
+        <h1 className="text-[30px] font-light leading-[1.02] tracking-tight md:text-[38px]">Team <br className="hidden md:block" />Directory</h1>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          {[
+            { icon: Users2, value: members.length, label: 'Members in your team' },
+            { icon: UserCheck, value: members.filter((m) => m.active).length, label: 'Active' },
+            { icon: AlarmClock, value: Array.from(stats.values()).reduce((a, x) => a + x.overdue, 0), label: 'Overdue across team' },
+          ].map(({ icon: Icon, value, label }) => (
+            <div key={label} className="flex items-center gap-2.5">
+              <span className="glass flex h-10 w-10 items-center justify-center rounded-full"><Icon size={16} /></span>
+              <div><CountUp value={value} className="block text-lg font-semibold leading-none" /><span className="text-[11px] text-muted-foreground">{label}</span></div>
+            </div>
+          ))}
+        </div>
         <button
           onClick={() => { setIsReset(false); setOpen(true) }}
-          className="flex items-center gap-1 rounded-xl accent-gradient px-3 py-2 text-sm font-semibold text-white"
-        ><Plus size={15} /> Add Team Member</button>
+          className="ml-auto flex items-center gap-1.5 rounded-full accent-gradient px-4 py-2.5 text-sm font-semibold transition-transform hover:scale-[1.03] active:scale-95"
+        ><Plus size={15} /> Add team member</button>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {members.map((m) => {
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {members.map((m, idx) => {
           const s = stats.get(m.id) ?? { open: 0, completed: 0, overdue: 0 }
+          const total = s.open + s.completed
+          const pct = total ? Math.round((s.completed / total) * 100) : 0
           return (
-            <div key={m.id} className="glass rounded-2xl p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-violet-500 text-xs font-semibold text-white">
-                    {(m.full_name ?? '?').slice(0, 1).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">{m.full_name}</p>
-                    <p className="text-[11px] text-muted-foreground">{m.email}</p>
-                    {m.phone && <p className="text-[11px] text-muted-foreground">{m.phone}</p>}
-                  </div>
-                </div>
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${m.active ? 'bg-emerald-500/15 text-emerald-600' : 'bg-slate-500/15 text-slate-500'}`}>
+            <div key={m.id} style={{ animationDelay: `${Math.min(idx, 10) * 40}ms` }} className={`glass lift animate-fade-up rounded-[1.8rem] p-4 ${m.active ? '' : 'opacity-60'}`}>
+              <div className="mb-3 flex items-start justify-between">
+                <Avatar name={m.full_name} size={48} />
+                <span className={`flex items-center gap-1.5 rounded-full bg-foreground/10 px-2.5 py-1 text-[11px] font-medium`}>
+                  <span className={`h-1.5 w-1.5 rounded-full ${m.active ? 'bg-emerald-400' : 'bg-zinc-400'}`} />
                   {m.active ? 'Active' : 'Inactive'}
                 </span>
               </div>
+              <p className="truncate text-[15px] font-semibold">{m.full_name}</p>
+              <p className="truncate text-[11px] text-muted-foreground">{m.email}</p>
+              <p className="mb-3 truncate text-[11px] text-muted-foreground">{m.phone ?? ' '}</p>
 
-              <div className="mb-3 grid grid-cols-3 gap-2 text-center text-xs">
-                <div><p className="font-semibold">{s.open}</p><p className="text-[10px] text-muted-foreground">Open</p></div>
-                <div><p className="font-semibold text-red-500">{s.overdue}</p><p className="text-[10px] text-muted-foreground">Overdue</p></div>
-                <div><p className="font-semibold text-emerald-600">{s.completed}</p><p className="text-[10px] text-muted-foreground">Done</p></div>
+              <div className="mb-3 grid grid-cols-3 gap-2 rounded-2xl bg-foreground/5 p-2.5 text-center">
+                <div><p className="text-sm font-semibold">{s.open}</p><p className="text-[10px] text-muted-foreground">Open</p></div>
+                <div><p className={`text-sm font-semibold ${s.overdue ? 'text-red-400' : ''}`}>{s.overdue}</p><p className="text-[10px] text-muted-foreground">Overdue</p></div>
+                <div><p className="text-sm font-semibold">{s.completed}</p><p className="text-[10px] text-muted-foreground">Done</p></div>
               </div>
 
-              <div className="mb-1.5 flex items-center gap-1.5">
-                <button onClick={() => setManagingAccess(m)} className="flex-1 rounded-lg bg-secondary/60 px-2 py-1.5 text-[11px] font-medium">Communities</button>
-                <button onClick={() => setEditing(m)} title="Edit" className="rounded-lg bg-secondary/60 p-1.5"><Pencil size={14} /></button>
+              <div className="mb-3 flex items-center gap-2">
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-foreground/10"><div className="h-full rounded-full bg-primary transition-all duration-700" style={{ width: `${pct}%` }} /></div>
+                <span className="text-[10px] font-semibold text-muted-foreground">{pct}%</span>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <button onClick={() => setManagingAccess(m)} className="flex-1 rounded-full bg-foreground/10 px-2 py-1.5 text-[11px] font-medium transition hover:bg-foreground/20">Communities</button>
+                <button onClick={() => setEditing(m)} title="Edit" aria-label="Edit" className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/10 transition hover:bg-foreground/20"><Pencil size={13} /></button>
                 <button
                   onClick={async () => {
                     try {
@@ -131,19 +147,21 @@ export default function TeamPage() {
                     }
                   }}
                   title="Reset password"
-                  className="rounded-lg bg-secondary/60 p-1.5"
-                ><KeyRound size={14} /></button>
+                  aria-label="Reset password"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/10 transition hover:bg-foreground/20"
+                ><KeyRound size={13} /></button>
                 <button
                   onClick={() => setActive.mutate({ id: m.id, active: !m.active })}
                   title={m.active ? 'Deactivate' : 'Reactivate'}
-                  className="rounded-lg bg-secondary/60 p-1.5"
-                ><Power size={14} /></button>
-                <button onClick={() => setDeleting(m)} title="Delete" className="rounded-lg bg-destructive/10 p-1.5 text-destructive"><Trash2 size={14} /></button>
+                  aria-label={m.active ? 'Deactivate' : 'Reactivate'}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/10 transition hover:bg-foreground/20"
+                ><Power size={13} /></button>
+                <button onClick={() => setDeleting(m)} title="Delete" aria-label="Delete" className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/15 text-red-400 transition hover:bg-red-500/25"><Trash2 size={13} /></button>
               </div>
             </div>
           )
         })}
-        {members.length === 0 && <p className="text-sm text-muted-foreground">No team members yet — add one above.</p>}
+        {members.length === 0 && <p className="glass col-span-full rounded-3xl p-8 text-center text-sm text-muted-foreground">No team members yet — add one above.</p>}
       </div>
 
       {open && (

@@ -107,7 +107,7 @@ export function RequestForm() {
         </div>
         <button
           onClick={() => { setResult(null); setValues(EMPTY); setRawIdea(''); setShowAiHelper(false); setOrgSelection(''); setOrgOther('') }}
-          className="rounded-xl accent-gradient px-4 py-2 text-sm font-semibold text-white"
+          className="rounded-xl accent-gradient px-4 py-2 text-sm font-semibold"
         >
           Submit another request
         </button>
@@ -124,13 +124,13 @@ export function RequestForm() {
         <button
           type="button"
           onClick={() => setShowAiHelper(true)}
-          className="mb-6 flex items-center gap-1.5 rounded-xl border border-violet-300/60 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 px-3 py-2 text-xs font-medium text-violet-600"
+          className="mb-6 flex items-center gap-1.5 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-xs font-medium text-ink"
         >
           <Sparkles size={14} /> Help me describe my requirement
         </button>
       ) : (
-        <div className="mb-6 rounded-2xl border border-violet-300/50 bg-violet-500/5 p-3">
-          <label className="mb-1 block text-xs font-medium text-violet-700">Just describe it in your own words</label>
+        <div className="mb-6 rounded-2xl border border-primary/30 bg-primary/10 p-3">
+          <label className="mb-1 block text-xs font-medium text-ink">Just describe it in your own words</label>
           <textarea
             value={rawIdea}
             onChange={(e) => setRawIdea(e.target.value)}
@@ -142,7 +142,7 @@ export function RequestForm() {
             type="button"
             onClick={runAiHelper}
             disabled={aiBusy || !rawIdea.trim()}
-            className="flex items-center gap-1.5 rounded-xl bg-violet-500 px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-xl accent-gradient px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
           >
             {aiBusy ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
             {aiBusy ? 'Structuring…' : 'Fill in the fields below'}

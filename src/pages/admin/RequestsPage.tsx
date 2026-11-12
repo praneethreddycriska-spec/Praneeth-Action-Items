@@ -67,7 +67,7 @@ export default function RequestsPage() {
   }), [requests])
 
   const filtered = useMemo(() => {
-    let list = tab === 'all' ? requests : requests.filter((r) => r.status === tab)
+    let list = tab === 'all' ? requests.filter((r) => r.status !== 'archived') : requests.filter((r) => r.status === tab)
     const q = search.trim().toLowerCase()
     if (q) {
       list = list.filter((r) =>

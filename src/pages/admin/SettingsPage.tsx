@@ -27,13 +27,13 @@ export default function SettingsPage() {
   ]
 
   return (
-    <div className="h-full overflow-y-auto p-4">
-      <h1 className="mb-4 text-lg font-semibold">Settings</h1>
+    <div className="h-full overflow-y-auto px-3 pb-8 md:px-6">
+      <h1 className="mb-5 text-[30px] font-light leading-[1.02] tracking-tight md:text-[38px]">Settings</h1>
 
       <div className="grid max-w-xl grid-cols-1 gap-4">
         <div className="glass rounded-2xl p-4">
           <div className="mb-1 flex items-center gap-2">
-            <Palette size={16} className="text-violet-500" />
+            <Palette size={16} className="text-ink" />
             <h2 className="text-sm font-semibold">Appearance</h2>
           </div>
           <p className="mb-4 text-xs text-muted-foreground">
@@ -48,7 +48,7 @@ export default function SettingsPage() {
                 onClick={() => setMode(value)}
                 className={cn(
                   'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors',
-                  mode === value ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-white/40 dark:hover:bg-white/5',
+                  mode === value ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-foreground/10',
                 )}
               >
                 <Icon size={13} /> {label}
@@ -90,7 +90,7 @@ export default function SettingsPage() {
 
         <div className="glass rounded-2xl p-4">
           <div className="mb-1 flex items-center gap-2">
-            <Sparkles size={16} className="text-violet-500" />
+            <Sparkles size={16} className="text-ink" />
             <h2 className="text-sm font-semibold">Auto Approval</h2>
           </div>
           <p className="mb-4 text-xs text-muted-foreground">
