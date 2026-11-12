@@ -14,10 +14,10 @@ export function NotificationBell() {
 
   return (
     <div className="relative">
-      <button onClick={() => setOpen((o) => !o)} className="glass relative rounded-xl p-2" aria-label="Notifications">
+      <button onClick={() => setOpen((o) => !o)} className="glass relative flex h-10 w-10 items-center justify-center rounded-full transition-transform active:scale-90" aria-label="Notifications">
         <Bell size={17} />
         {unread > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full accent-gradient px-1 text-[9px] font-bold">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
@@ -31,12 +31,12 @@ export function NotificationBell() {
               initial={{ opacity: 0, y: -8, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.97 }}
-              className="glass-strong absolute right-0 top-11 z-50 max-h-96 w-80 overflow-hidden rounded-2xl"
+              className="glass-strong absolute right-0 top-12 z-50 max-h-96 w-80 overflow-hidden rounded-3xl"
             >
               <div className="flex items-center justify-between border-b border-border/60 p-3">
                 <h3 className="text-sm font-semibold">Notifications</h3>
                 {unread > 0 && (
-                  <button onClick={() => markAll.mutate()} className="flex items-center gap-1 text-[11px] text-primary">
+                  <button onClick={() => markAll.mutate()} className="flex items-center gap-1 text-[11px] text-ink">
                     <Check size={12} /> Mark all read
                   </button>
                 )}

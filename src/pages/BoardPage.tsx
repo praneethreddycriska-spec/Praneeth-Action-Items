@@ -1,17 +1,21 @@
 import { useMemo, useState } from 'react'
-import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
-import { format } from 'date-fns'
+import { useNavigate } from 'react-router-dom'
+import { DndContext, PointerSensor, useDroppable, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
+import { format, isThisMonth } from 'date-fns'
+import { Layers, AlarmClock, CheckCircle2, Trophy } from 'lucide-react'
 import type { ActionItem, GroupMode, ActionStatus } from '@/types'
 import { STATUS_LABELS, STATUS_ORDER } from '@/types'
 import { useActionItems, useMoveActionItem, useUpdateActionItem } from '@/hooks/useActionItems'
-import { useCommunities } from '@/hooks/useCommunities'
-import { BoardColumn } from '@/features/actions/BoardColumn'
-import { BoardControls } from '@/features/actions/BoardControls'
+import { useCommunities, useProfiles } from '@/hooks/useCommunities'
+import { BoardColumn, type Tone } from '@/features/actions/BoardColumn'
+import { BoardControls, type BoardView } from '@/features/actions/BoardControls'
 import { QuickCreate } from '@/features/actions/QuickCreate'
-import { Skeleton } from '@/components/motion'
+import { Skeleton, CountUp } from '@/components/motion'
 import { ActionDetailDrawer } from '@/features/actions/ActionDetailDrawer'
 import { getDeadlineState, sortByUrgency, daysOverdue } from '@/utils/deadline'
-import { PriorityStars } from '@/components/PriorityStars'
+import { AvatarStack } from '@/components/Avatar'
+import { cn } from '@/lib/utils'
+import type { Profile } from '@/types'
 
 const PRIORITY_BUCKETS = [
   { key: '10', label: 'Critical (10)', test: (p: number) => p === 10 },
@@ -21,15 +25,86 @@ const PRIORITY_BUCKETS = [
   { key: '0-2', label: 'Minimal (0-2)', test: (p: number) => p <= 2 },
 ]
 
+const STATUS_TONE: Record<ActionStatus, Tone> = {
+  inbox: 'blue', todo: 'olive', in_progress: 'rust', waiting: 'slate', blocked: 'rust', completed: 'slate',
+}
+const TONES: Tone[] = ['blue', 'olive', 'rust', 'slate']
+
+function StatChip({ icon: Icon, value, label }: { icon: typeof Layers; value: number; label: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="glass flex h-10 w-10 items-center justify-center rounded-full"><Icon size={16} /></span>
+      <div>
+        <CountUp value={value} className="block text-lg font-semibold leading-none" />
+        <span className="text-[11px] text-muted-foreground">{label}</span>
+      </div>
+    </div>
+  )
+}
+
+function DoneTile({ count, open, onToggle }: { count: number; open: boolean; onToggle: () => void }) {
+  const { setNodeRef, isOver } = useDroppable({ id: 'completed' })
+  return (
+    <div className="hidden w-[112px] shrink-0 flex-col gap-3 pt-9 lg:flex">
+      <button
+        ref={setNodeRef}
+        onClick={onToggle}
+        className={cn('glass flex flex-col items-center gap-1.5 rounded-[2rem] px-3 py-5 text-center transition-all hover:scale-[1.03] active:scale-95', isOver && '!border-primary ring-2 ring-primary/50')}
+        title={open ? 'Hide completed' : 'Show completed'}
+      >
+        <span className="flex h-12 w-12 items-center justify-center rounded-full accent-gradient"><Trophy size={20} /></span>
+        <span className="text-sm font-semibold">Done</span>
+        <span className="text-[11px] text-muted-foreground">{count} total</span>
+        <span className="mt-1 text-[10px] font-medium text-ink">{open ? 'Hide' : 'Show'}</span>
+      </button>
+    </div>
+  )
+}
+
+function ListView({ items, onOpen }: { items: ActionItem[]; onOpen: (i: ActionItem) => void }) {
+  if (items.length === 0) return <p className="glass rounded-3xl p-8 text-center text-sm text-muted-foreground">No action items match your filters.</p>
+  return (
+    <div className="space-y-2 pb-6">
+      {items.map((i, idx) => {
+        const st = getDeadlineState(i)
+        return (
+          <button
+            key={i.id}
+            onClick={() => onOpen(i)}
+            style={{ animationDelay: `${Math.min(idx, 10) * 30}ms` }}
+            className="glass lift animate-fade-up flex w-full items-center gap-3 rounded-full px-4 py-3 text-left"
+          >
+            <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold', i.priority >= 8 ? 'bg-red-400/20 text-red-400' : 'bg-foreground/10')}>{i.priority}</span>
+            <span className="min-w-0 flex-1">
+              <span className={cn('block truncate text-sm font-semibold', i.status === 'completed' && 'line-through opacity-60')}>{i.title}</span>
+              <span className="block truncate text-[11px] text-muted-foreground">{[i.community?.name, i.requested_by_name ? `by ${i.requested_by_name}` : null].filter(Boolean).join(' · ') || 'No community'}</span>
+            </span>
+            <span className="hidden rounded-full bg-foreground/10 px-2.5 py-1 text-[11px] font-medium sm:inline">{STATUS_LABELS[i.status]}</span>
+            <span className={cn('hidden w-24 shrink-0 text-right text-xs sm:block', st === 'overdue' ? 'font-semibold text-red-400' : 'text-muted-foreground')}>
+              {i.deadline ? (st === 'overdue' ? `${daysOverdue(i)}d overdue` : format(new Date(i.deadline), 'MMM d')) : '—'}
+            </span>
+            <AvatarStack names={[i.follow_up_person?.full_name, i.owner?.full_name]} size={26} />
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function BoardPage() {
   const { data: items = [], isLoading } = useActionItems()
   const { data: communities = [] } = useCommunities()
+  const { data: profiles = [] } = useProfiles()
   const move = useMoveActionItem()
   const update = useUpdateActionItem()
+  const navigate = useNavigate()
 
   const [groupMode, setGroupMode] = useState<GroupMode>('status')
   const [search, setSearch] = useState('')
   const [minPriority, setMinPriority] = useState(0)
+  const [personId, setPersonId] = useState<string | null>(null)
+  const [view, setView] = useState<BoardView>('board')
+  const [showDone, setShowDone] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = items.find((x) => x.id === selectedId) ?? null
   const setSelected = (x: ActionItem | null) => setSelectedId(x?.id ?? null)
@@ -39,16 +114,24 @@ export default function BoardPage() {
   const filtered = useMemo(() => {
     return items.filter((i) => {
       if (i.priority < minPriority) return false
+      if (personId && i.follow_up_person_id !== personId && i.owner_id !== personId) return false
       if (search && !i.title.toLowerCase().includes(search.toLowerCase())) return false
       return true
     })
-  }, [items, minPriority, search])
+  }, [items, minPriority, search, personId])
+
+  const stats = useMemo(() => ({
+    open: items.filter((i) => i.status !== 'completed').length,
+    overdue: items.filter((i) => getDeadlineState(i) === 'overdue').length,
+    doneMonth: items.filter((i) => i.completed_at && isThisMonth(new Date(i.completed_at))).length,
+    doneTotal: items.filter((i) => i.status === 'completed').length,
+  }), [items])
 
   const overdueItems = useMemo(() => sortByUrgency(filtered.filter((i) => getDeadlineState(i) === 'overdue')), [filtered])
 
   const groups = useMemo(() => {
     if (groupMode === 'status') {
-      return STATUS_ORDER.map((s) => ({ key: s, label: STATUS_LABELS[s], items: filtered.filter((i) => i.status === s), accent: undefined as string | undefined }))
+      return STATUS_ORDER.filter((s) => s !== 'completed' || showDone).map((s) => ({ key: s, label: STATUS_LABELS[s], items: filtered.filter((i) => i.status === s), tone: STATUS_TONE[s] }))
     }
     if (groupMode === 'community') {
       const byId = new Map(communities.map((c) => [c.id, c]))
@@ -56,7 +139,7 @@ export default function BoardPage() {
       return ids.map((id) => ({
         key: id, label: id === 'ungrouped' ? 'Ungrouped' : byId.get(id)?.name ?? 'Unknown',
         items: filtered.filter((i) => (i.community_id ?? 'ungrouped') === id),
-        accent: id === 'ungrouped' ? undefined : byId.get(id)?.color,
+        tone: undefined,
       }))
     }
     if (groupMode === 'individual') {
@@ -65,18 +148,18 @@ export default function BoardPage() {
       const ids = Array.from(new Set(filtered.map((i) => i.follow_up_person_id ?? 'unassigned')))
       return ids.map((id) => ({
         key: id, label: id === 'unassigned' ? 'Unassigned' : names.get(id) ?? 'Unknown',
-        items: filtered.filter((i) => (i.follow_up_person_id ?? 'unassigned') === id), accent: undefined,
+        items: filtered.filter((i) => (i.follow_up_person_id ?? 'unassigned') === id), tone: undefined,
       }))
     }
     if (groupMode === 'priority') {
-      return PRIORITY_BUCKETS.map((b) => ({ key: b.key, label: b.label, items: filtered.filter((i) => b.test(i.priority)), accent: undefined }))
+      return PRIORITY_BUCKETS.map((b) => ({ key: b.key, label: b.label, items: filtered.filter((i) => b.test(i.priority)), tone: undefined }))
     }
     if (groupMode === 'deadline') {
       const states = ['overdue', 'today', 'tomorrow', 'soon3', 'soon7', 'future', 'none', 'completed'] as const
-      return states.map((s) => ({ key: s, label: s, items: filtered.filter((i) => getDeadlineState(i) === s), accent: undefined }))
+      return states.map((s) => ({ key: s, label: s, items: filtered.filter((i) => getDeadlineState(i) === s), tone: undefined }))
     }
-    return [{ key: 'all', label: 'All action items', items: filtered, accent: undefined }]
-  }, [groupMode, filtered, communities])
+    return [{ key: 'all', label: 'All action items', items: filtered, tone: undefined }]
+  }, [groupMode, filtered, communities, showDone])
 
   const handleDragEnd = (e: DragEndEvent) => {
     const { active, over } = e
@@ -84,6 +167,7 @@ export default function BoardPage() {
     const item = items.find((i) => i.id === active.id)
     if (!item) return
 
+    if (over.id === 'completed') { move(item.id, 'completed', Date.now()); return }
     const overColumn = groups.find((g) => g.key === over.id)
     if (overColumn && groupMode === 'status') {
       move(item.id, overColumn.key as ActionStatus, Date.now())
@@ -98,24 +182,37 @@ export default function BoardPage() {
   }
 
   return (
-    <div className="relative flex h-full flex-col p-4">
-      <div className="mb-3 flex flex-wrap items-start gap-3 sm:items-center">
-        <div className="mr-auto">
-          <h1 className="text-lg font-semibold">Board</h1>
-          <p className="text-xs text-muted-foreground">{format(new Date(), 'EEEE, MMM d yyyy')} · {filtered.length} action items</p>
+    <div className="relative flex h-full flex-col px-3 pb-3 md:px-6">
+      <div className="mb-4 flex flex-wrap items-center gap-x-7 gap-y-3">
+        <div>
+          <h1 className="text-[30px] font-light leading-[1.02] tracking-tight md:text-[38px]">
+            Action <br className="hidden md:block" />Pipeline
+          </h1>
+          <p className="mt-1 text-[11px] text-muted-foreground">{format(new Date(), 'EEEE, MMM d yyyy')}</p>
         </div>
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-          <BoardControls groupMode={groupMode} onGroupMode={setGroupMode} search={search} onSearch={setSearch} minPriority={minPriority} onMinPriority={setMinPriority} />
-          <QuickCreate />
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <StatChip icon={Layers} value={stats.open} label="Open actions" />
+          <StatChip icon={AlarmClock} value={stats.overdue} label="Overdue" />
+          <StatChip icon={CheckCircle2} value={stats.doneMonth} label="Done this month" />
         </div>
+        <div className="ml-auto"><QuickCreate /></div>
       </div>
 
-      {overdueItems.length > 0 && (
-        <div className="mb-3 rounded-2xl border border-red-500/30 bg-red-500/5 p-3">
-          <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-red-600">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> Overdue ({overdueItems.length})
+      <div className="mb-4">
+        <BoardControls
+          groupMode={groupMode} onGroupMode={setGroupMode} search={search} onSearch={setSearch}
+          minPriority={minPriority} onMinPriority={setMinPriority}
+          people={(profiles as Profile[]).filter((p) => p.active)} personId={personId} onPerson={setPersonId}
+          view={view} onView={setView}
+        />
+      </div>
+
+      {overdueItems.length > 0 && view === 'board' && (
+        <div className="mb-3 rounded-[1.6rem] border border-red-400/25 bg-red-500/10 p-3">
+          <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-red-400">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Overdue ({overdueItems.length})
           </h3>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
             {overdueItems.map((i) => (
               <div
                 key={i.id}
@@ -123,14 +220,14 @@ export default function BoardPage() {
                 tabIndex={0}
                 onClick={() => setSelected(i)}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSelected(i) }}
-                className="glass flex min-w-[220px] shrink-0 cursor-pointer flex-col gap-1 rounded-xl p-2.5 text-left"
+                className="glass lift flex min-w-[230px] shrink-0 cursor-pointer flex-col gap-1 rounded-2xl p-3 text-left"
               >
                 <div className="flex items-center justify-between">
-                  <PriorityStars value={i.priority} size={10} />
-                  <span className="text-[10px] font-semibold text-red-600">{daysOverdue(i)}d overdue</span>
+                  <span className="text-[10px] font-semibold text-red-400">{daysOverdue(i)}d overdue</span>
+                  <span className="text-[10px] text-muted-foreground">P{i.priority}</span>
                 </div>
-                <p className="truncate text-xs font-medium">{i.title}</p>
-                <p className="text-[10px] text-muted-foreground">{i.community?.name ?? 'No community'} {i.follow_up_person ? `· ${i.follow_up_person.full_name}` : ''}</p>
+                <p className="truncate text-xs font-semibold">{i.title}</p>
+                <p className="truncate text-[10px] text-muted-foreground">{i.community?.name ?? 'No community'} {i.follow_up_person ? `· ${i.follow_up_person.full_name}` : ''}</p>
               </div>
             ))}
           </div>
@@ -138,13 +235,22 @@ export default function BoardPage() {
       )}
 
       {isLoading ? (
-        <div className="flex flex-1 gap-3 overflow-hidden">{[0, 1, 2].map((n) => <Skeleton key={n} className="h-72 w-72 shrink-0" />)}</div>
+        <div className="flex flex-1 gap-3 overflow-hidden">{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-72 w-[272px] shrink-0" />)}</div>
+      ) : view === 'list' ? (
+        <div className="min-h-0 flex-1 overflow-y-auto"><ListView items={sortByUrgency(filtered)} onOpen={setSelected} /></div>
       ) : (
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-          <div className="flex flex-1 gap-3 overflow-x-auto pb-2">
-            {groups.map((g) => (
-              <BoardColumn key={g.key} id={g.key} title={g.label} items={g.items} accent={g.accent} onOpen={setSelected} onComplete={(i) => update.mutate({ id: i.id, status: 'completed' })} />
+          <div className="flex min-h-0 flex-1 gap-4 overflow-x-auto pb-2">
+            {groups.map((g, idx) => (
+              <BoardColumn
+                key={g.key} id={g.key} title={g.label} items={g.items}
+                tone={g.tone ?? TONES[idx % TONES.length]}
+                onOpen={setSelected}
+                onComplete={(i) => update.mutate({ id: i.id, status: 'completed' })}
+                onAdd={groupMode === 'status' ? () => navigate(`/admin?new=1&status=${g.key}`) : undefined}
+              />
             ))}
+            {groupMode === 'status' && <DoneTile count={stats.doneTotal} open={showDone} onToggle={() => setShowDone((v) => !v)} />}
           </div>
         </DndContext>
       )}

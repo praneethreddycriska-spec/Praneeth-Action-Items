@@ -3,16 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Action Items</title>
     <script>
       (function () {
         try {
-          var mode = localStorage.getItem('action-items-theme-mode') || 'system';
+          if (localStorage.getItem('action-items-theme-v') !== '2') {
+            localStorage.setItem('action-items-theme-v', '2');
+            localStorage.setItem('action-items-theme-mode', 'dark');
+            localStorage.setItem('action-items-theme-color', '#C8F145');
+          }
+          var mode = localStorage.getItem('action-items-theme-mode') || 'dark';
           var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
           if (dark) document.documentElement.classList.add('dark');
 
-          var hex = localStorage.getItem('action-items-theme-color') || '#7C6CF6';
+          var hex = localStorage.getItem('action-items-theme-color') || '#C8F145';
           var c = hex.replace('#', '');
           var r = parseInt(c.slice(0, 2), 16) / 255, g = parseInt(c.slice(2, 4), 16) / 255, b = parseInt(c.slice(4, 6), 16) / 255;
           var max = Math.max(r, g, b), min = Math.min(r, g, b), h = 0, s = 0, l = (max + min) / 2;
@@ -26,12 +34,15 @@
           }
           h = Math.round(h * 360); s = Math.round(s * 100); l = Math.round(l * 100);
           var triplet = h + ' ' + s + '% ' + l + '%';
-          var fg = l > 65 ? '230 30% 12%' : '0 0% 100%';
+          function lin(c) { return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+          var lum = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+          var fg = lum > 0.28 ? '230 30% 10%' : '0 0% 100%';
           var root = document.documentElement.style;
           root.setProperty('--primary', triplet);
           root.setProperty('--primary-foreground', fg);
           root.setProperty('--ring', triplet);
           root.setProperty('--accent', h + ' ' + s + '% 58%');
+          root.setProperty('--primary-text', dark ? triplet : h + ' ' + s + '% ' + Math.min(l, 32) + '%');
         } catch (e) {}
       })();
     </script>

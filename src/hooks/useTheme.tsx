@@ -1,11 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
-import { hexToHslTriplet, foregroundForHsl } from '@/lib/theme/color'
+import { hexToHslTriplet, foregroundForHsl, primaryTextFor } from '@/lib/theme/color'
 
 export type ThemeMode = 'light' | 'dark' | 'system'
 
 const MODE_KEY = 'action-items-theme-mode'
 const COLOR_KEY = 'action-items-theme-color'
-const DEFAULT_COLOR = '#7C6CF6'
+const DEFAULT_COLOR = '#C8F145'
 
 interface ThemeContextValue {
   mode: ThemeMode
@@ -22,7 +22,7 @@ function readStoredMode(): ThemeMode {
     const v = localStorage.getItem(MODE_KEY)
     if (v === 'light' || v === 'dark' || v === 'system') return v
   } catch { /* ignore */ }
-  return 'system'
+  return 'dark'
 }
 
 function readStoredColor(): string {
@@ -33,13 +33,14 @@ function readStoredColor(): string {
   }
 }
 
-function applyAccentColor(hex: string) {
+function applyAccentColor(hex: string, mode: 'light' | 'dark') {
   const triplet = hexToHslTriplet(hex)
   const fg = foregroundForHsl(triplet)
   const root = document.documentElement.style
   root.setProperty('--primary', triplet)
   root.setProperty('--primary-foreground', fg)
   root.setProperty('--ring', triplet)
+  root.setProperty('--primary-text', primaryTextFor(triplet, mode))
   // Accent stays a related-but-distinct hue for visual interest (shifted lightness).
   const [h, s] = triplet.split(' ')
   root.setProperty('--accent', `${h} ${s} 58%`)
@@ -55,7 +56,7 @@ function applyMode(mode: ThemeMode): 'light' | 'dark' {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<ThemeMode>(() => readStoredMode())
   const [accentColor, setAccentColorState] = useState<string>(() => readStoredColor())
-  const [resolvedMode, setResolvedMode] = useState<'light' | 'dark'>('light')
+  const [resolvedMode, setResolvedMode] = useState<'light' | 'dark'>(() => (document.documentElement.classList.contains('dark') ? 'dark' : 'light'))
 
   useEffect(() => {
     setResolvedMode(applyMode(mode))
@@ -67,8 +68,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [mode])
 
   useEffect(() => {
-    applyAccentColor(accentColor)
-  }, [accentColor])
+    applyAccentColor(accentColor, resolvedMode)
+  }, [accentColor, resolvedMode])
 
   const setMode = useCallback((m: ThemeMode) => {
     setModeState(m)

@@ -1,15 +1,19 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { MessageSquare, Check, User, UserPlus } from 'lucide-react'
+import { Check, Star } from 'lucide-react'
+import { format } from 'date-fns'
 import type { ActionItem } from '@/types'
 import { cn } from '@/lib/utils'
-import { getDeadlineState, DEADLINE_STYLES, formatSmartDate } from '@/utils/deadline'
-import { PriorityStars } from '@/components/PriorityStars'
+import { getDeadlineState, daysOverdue } from '@/utils/deadline'
+import { AvatarStack } from '@/components/Avatar'
 
-export function ActionCard({ item, index = 0, onOpen, onComplete }: { item: ActionItem; index?: number; onOpen: () => void; onComplete: () => void }) {
+export function ActionCard({
+  item, index = 0, tone = 'blue', onOpen, onComplete,
+}: { item: ActionItem; index?: number; tone?: 'blue' | 'olive' | 'rust' | 'slate'; onOpen: () => void; onComplete: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
-  const deadlineState = getDeadlineState(item)
+  const state = getDeadlineState(item)
   const style = { transform: CSS.Transform.toString(transform), transition, animationDelay: `${Math.min(index, 8) * 45}ms` }
+  const sub = [item.community?.name, item.requested_by_name ? `by ${item.requested_by_name}` : null].filter(Boolean).join(' · ')
 
   return (
     <div
@@ -19,53 +23,40 @@ export function ActionCard({ item, index = 0, onOpen, onComplete }: { item: Acti
       {...listeners}
       onClick={onOpen}
       className={cn(
-        'glass lift-soft animate-fade-up group cursor-pointer rounded-3xl p-3.5',
-        isDragging && 'scale-[1.02] opacity-60 shadow-2xl',
-        item.priority >= 10 && 'ring-1 ring-red-500/40',
+        `kcol-${tone} kcard lift-soft animate-fade-up group cursor-pointer rounded-[1.4rem] p-3.5`,
+        isDragging && 'scale-[1.03] opacity-70 shadow-2xl',
+        item.priority >= 10 && 'ring-1 ring-red-400/60',
       )}
     >
-      <div className="mb-1.5 flex items-center justify-between">
-        <PriorityStars value={item.priority} size={11} />
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <p className="kcard-sub text-[11px] font-medium">
+          {item.deadline ? `Due ${format(new Date(item.deadline), 'MMM d')}` : 'No deadline'}
+          {state === 'overdue' && <span className="kchip ml-1.5 rounded-full px-1.5 py-0.5 font-semibold">{daysOverdue(item)}d late</span>}
+        </p>
         {item.status !== 'completed' && (
           <button
             onClick={(e) => { e.stopPropagation(); onComplete() }}
-            className="rounded-full p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-emerald-500/15 hover:text-emerald-600 group-hover:opacity-100"
+            onPointerDown={(e) => e.stopPropagation()}
+            className="kchip flex h-6 w-6 shrink-0 items-center justify-center rounded-full opacity-60 transition hover:opacity-100 group-hover:opacity-100"
             title="Mark complete"
+            aria-label="Mark complete"
           >
-            <Check size={14} />
+            <Check size={13} />
           </button>
         )}
       </div>
 
-      <p className={cn('mb-1.5 line-clamp-2 text-sm font-medium leading-snug', item.status === 'completed' && 'text-muted-foreground line-through')}>
+      <p className={cn('mb-0.5 line-clamp-2 text-[15px] font-semibold leading-snug', item.status === 'completed' && 'line-through opacity-70')}>
         {item.title}
       </p>
+      {sub && <p className="kcard-sub mb-3 truncate text-[11px]">{sub}</p>}
 
-      <div className="mb-2 flex flex-wrap items-center gap-1.5">
-        {item.community && (
-          <span className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ backgroundColor: `${item.community.color}22`, color: item.community.color }}>
-            {item.community.name}
-          </span>
-        )}
-        <span className={cn('rounded-full border px-2 py-0.5 text-[10px] font-medium', DEADLINE_STYLES[deadlineState].className)}>
-          {item.deadline ? formatSmartDate(item.deadline) : DEADLINE_STYLES[deadlineState].label}
-        </span>
-      </div>
-
-      {(item.follow_up_person || item.expected_output || item.requested_by_name) && (
-        <div className="space-y-0.5 border-t border-border/60 pt-1.5 text-[11px] text-muted-foreground">
-          {item.requested_by_name && (
-            <div className="flex items-center gap-1"><UserPlus size={10} /> Raised by {item.requested_by_name}</div>
-          )}
-          {item.follow_up_person && (
-            <div className="flex items-center gap-1"><User size={10} /> {item.follow_up_person.full_name}</div>
-          )}
-          {item.expected_output && <p className="truncate">→ {item.expected_output}</p>}
+      <div className="mt-3 flex items-end justify-between">
+        <div className="flex items-center gap-1.5 text-lg font-semibold leading-none">
+          <Star size={14} className={cn(item.priority >= 10 ? 'fill-red-400 text-red-400' : 'fill-current opacity-80')} />
+          {item.priority}<span className="kcard-sub text-xs font-medium">/10</span>
         </div>
-      )}
-
-      <div className="mt-1.5 flex items-center gap-1 text-muted-foreground">
-        <MessageSquare size={11} />
+        <AvatarStack names={[item.follow_up_person?.full_name, item.owner?.full_name !== item.follow_up_person?.full_name ? item.owner?.full_name : null]} size={26} />
       </div>
     </div>
   )

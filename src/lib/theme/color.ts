@@ -26,13 +26,36 @@ export function hexToHslTriplet(hex: string): string {
   return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`
 }
 
-/** Picks a readable foreground (near-black or near-white) for a given "H S% L%" triplet. */
+function parseTriplet(triplet: string): [number, number, number] {
+  const [h, sat, l] = triplet.split(' ')
+  return [Number(h), Number(sat.replace('%', '')), Number(l.replace('%', ''))]
+}
+
+function relativeLuminance(triplet: string): number {
+  const [h, sPct, lPct] = parseTriplet(triplet)
+  const s = sPct / 100
+  const l = lPct / 100
+  const k = (n: number) => (n + h / 30) % 12
+  const a = s * Math.min(l, 1 - l)
+  const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)))
+  const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4))
+  return 0.2126 * lin(f(0)) + 0.7152 * lin(f(8)) + 0.0722 * lin(f(4))
+}
+
+/** Picks a readable foreground (near-black or near-white) using real luminance, so bright colors like lime get dark text. */
 export function foregroundForHsl(triplet: string): string {
-  const l = Number(triplet.split(' ')[2]?.replace('%', ''))
-  return l > 65 ? '230 30% 12%' : '0 0% 100%'
+  return relativeLuminance(triplet) > 0.28 ? '230 30% 10%' : '0 0% 100%'
+}
+
+/** Accent color used for text/icons. On light backgrounds bright accents are darkened so they stay readable. */
+export function primaryTextFor(triplet: string, mode: 'light' | 'dark'): string {
+  if (mode === 'dark') return triplet
+  const [h, s, l] = parseTriplet(triplet)
+  return `${h} ${s}% ${Math.min(l, 32)}%`
 }
 
 export const ACCENT_PRESETS: { name: string; hex: string }[] = [
+  { name: 'Lime', hex: '#C8F145' },
   { name: 'Violet', hex: '#7C6CF6' },
   { name: 'Indigo', hex: '#6366F1' },
   { name: 'Blue', hex: '#3B82F6' },

@@ -3,52 +3,56 @@
 @tailwind utilities;
 
 :root {
-  --background: 250 45% 97.5%;
-  --foreground: 222 30% 14%;
+  --background: 60 14% 96%;
+  --foreground: 30 12% 10%;
   --card: 0 0% 100%;
-  --card-foreground: 222 30% 14%;
-  --primary: 250 84% 60%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 250 40% 94%;
-  --secondary-foreground: 222 30% 20%;
-  --muted: 250 30% 93%;
-  --muted-foreground: 220 12% 45%;
-  --accent: 280 70% 60%;
-  --accent-foreground: 0 0% 100%;
+  --card-foreground: 30 12% 10%;
+  --primary: 74 87% 60%;
+  --primary-foreground: 230 30% 10%;
+  --primary-text: 74 87% 30%;
+  --secondary: 60 12% 92%;
+  --secondary-foreground: 30 12% 20%;
+  --muted: 60 10% 92%;
+  --muted-foreground: 30 6% 42%;
+  --accent: 74 87% 52%;
+  --accent-foreground: 230 30% 10%;
   --destructive: 0 75% 58%;
   --destructive-foreground: 0 0% 100%;
-  --border: 250 22% 90%;
-  --input: 220 20% 88%;
-  --ring: 250 84% 60%;
+  --border: 40 10% 86%;
+  --input: 40 10% 86%;
+  --ring: 74 87% 60%;
   --radius: 1.1rem;
-  --tone-mint: 160 65% 92%;
-  --tone-peach: 24 95% 92%;
-  --tone-sky: 200 90% 92%;
-  --tone-rose: 345 90% 94%;
+  --tone-mint: 150 60% 90%;
+  --tone-peach: 24 95% 91%;
+  --tone-sky: 205 90% 91%;
+  --tone-rose: 345 90% 93%;
+  --kc-blue: 212 70% 90%;   --kc-blue-fg: 215 35% 16%;
+  --kc-olive: 78 55% 87%;   --kc-olive-fg: 80 40% 14%;
+  --kc-rust: 14 80% 90%;    --kc-rust-fg: 14 45% 16%;
+  --kc-slate: 220 14% 88%;  --kc-slate-fg: 220 15% 16%;
 }
 
 .dark {
-  --background: 230 28% 8%;
-  --foreground: 210 30% 96%;
-  --card: 228 26% 12%;
-  --card-foreground: 210 30% 96%;
-  --primary: 255 92% 70%;
-  --primary-foreground: 230 30% 10%;
-  --secondary: 228 22% 16%;
-  --secondary-foreground: 210 20% 90%;
-  --muted: 228 20% 16%;
-  --muted-foreground: 220 12% 65%;
-  --accent: 280 80% 68%;
-  --accent-foreground: 230 30% 10%;
-  --destructive: 0 70% 60%;
+  --background: 30 8% 7%;
+  --foreground: 40 20% 96%;
+  --card: 30 8% 11%;
+  --card-foreground: 40 20% 96%;
+  --secondary: 30 6% 16%;
+  --secondary-foreground: 40 15% 90%;
+  --muted: 30 6% 16%;
+  --muted-foreground: 40 8% 66%;
+  --destructive: 0 70% 62%;
   --destructive-foreground: 0 0% 100%;
-  --border: 228 18% 22%;
-  --input: 228 18% 22%;
-  --ring: 255 92% 70%;
-  --tone-mint: 160 40% 18%;
-  --tone-peach: 24 45% 20%;
-  --tone-sky: 200 50% 20%;
-  --tone-rose: 345 45% 21%;
+  --border: 40 10% 24%;
+  --input: 40 10% 24%;
+  --tone-mint: 150 28% 20%;
+  --tone-peach: 24 38% 21%;
+  --tone-sky: 205 36% 22%;
+  --tone-rose: 345 32% 23%;
+  --kc-blue: 212 28% 34%;   --kc-blue-fg: 210 30% 97%;
+  --kc-olive: 78 40% 27%;   --kc-olive-fg: 78 40% 96%;
+  --kc-rust: 14 42% 31%;    --kc-rust-fg: 14 50% 96%;
+  --kc-slate: 220 8% 36%;   --kc-slate-fg: 220 10% 96%;
 }
 
 * { border-color: hsl(var(--border)); }
@@ -56,70 +60,92 @@
 body {
   @apply bg-background text-foreground antialiased;
   background-image:
-    radial-gradient(circle at 10% 0%, hsl(var(--primary) / 0.10), transparent 42%),
-    radial-gradient(circle at 95% 8%, hsl(var(--accent) / 0.08), transparent 40%);
+    radial-gradient(circle at 8% 0%, hsl(var(--primary) / 0.16), transparent 42%),
+    radial-gradient(circle at 98% 6%, hsl(var(--primary) / 0.08), transparent 40%);
   background-attachment: fixed;
   font-feature-settings: 'ss01', 'cv01';
 }
 
+/* Warm, blurred "photo" backdrop from the reference: olive top-left, slate top-right, rust bottom-right */
+.dark body {
+  background-image:
+    radial-gradient(60% 55% at 14% -4%, hsl(78 32% 25% / 0.85), transparent 70%),
+    radial-gradient(48% 45% at 100% 6%, hsl(212 24% 30% / 0.7), transparent 70%),
+    radial-gradient(70% 55% at 88% 104%, hsl(16 40% 25% / 0.8), transparent 70%),
+    radial-gradient(52% 42% at -4% 100%, hsl(96 26% 19% / 0.7), transparent 70%);
+}
+
 .glass {
-  background: hsl(0 0% 100% / 0.86);
-  backdrop-filter: blur(14px) saturate(150%);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
-  border: 1px solid hsl(var(--primary) / 0.10);
-  box-shadow: 0 1px 2px hsl(var(--primary) / 0.06), 0 14px 34px -14px hsl(var(--primary) / 0.22);
+  background: hsl(0 0% 100% / 0.82);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid hsl(30 10% 10% / 0.07);
+  box-shadow: 0 1px 2px hsl(30 10% 10% / 0.05), 0 14px 34px -16px hsl(30 10% 10% / 0.25);
 }
 
 .dark .glass {
-  background: hsl(228 26% 13% / 0.82);
-  border: 1px solid hsl(0 0% 100% / 0.07);
-  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.4), 0 16px 36px -14px hsl(0 0% 0% / 0.6);
+  background: hsl(0 0% 100% / 0.055);
+  backdrop-filter: blur(20px) saturate(130%);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
+  border: 1px solid hsl(0 0% 100% / 0.1);
+  box-shadow: 0 18px 48px -24px hsl(0 0% 0% / 0.7);
 }
 
 .glass-strong {
   background: hsl(0 0% 100% / 0.94);
-  backdrop-filter: blur(24px) saturate(170%);
-  -webkit-backdrop-filter: blur(24px) saturate(170%);
-  border: 1px solid hsl(var(--primary) / 0.12);
-  box-shadow: 0 24px 60px -20px hsl(var(--primary) / 0.35);
+  backdrop-filter: blur(26px) saturate(150%);
+  -webkit-backdrop-filter: blur(26px) saturate(150%);
+  border: 1px solid hsl(30 10% 10% / 0.08);
+  box-shadow: 0 24px 60px -20px hsl(30 10% 10% / 0.35);
 }
 
 .dark .glass-strong {
-  background: hsl(228 26% 14% / 0.94);
-  border: 1px solid hsl(0 0% 100% / 0.09);
+  background: hsl(30 8% 11% / 0.88);
+  border: 1px solid hsl(0 0% 100% / 0.12);
+  box-shadow: 0 30px 70px -24px hsl(0 0% 0% / 0.85);
 }
 
 /* Interactive cards: lift on hover, press on tap */
-.lift {
-  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
-}
-.lift:hover { transform: translateY(-3px); box-shadow: 0 2px 4px hsl(var(--primary) / 0.08), 0 22px 44px -16px hsl(var(--primary) / 0.35); }
+.lift { transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, border-color 0.25s ease; }
+.lift:hover { transform: translateY(-3px); border-color: hsl(var(--primary) / 0.35); }
 .lift:active { transform: translateY(-1px) scale(0.99); }
+.lift-soft { transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease; }
+.lift-soft:hover { border-color: hsl(0 0% 100% / 0.28); box-shadow: 0 18px 36px -18px hsl(0 0% 0% / 0.55); }
 
-/* Pastel bento tiles (follow the accent color for the lilac tone) */
-.tone-lilac { background: hsl(var(--primary) / 0.13); }
+/* Pastel / muted tiles */
+.tone-lilac { background: hsl(var(--primary) / 0.14); }
 .tone-mint { background: hsl(var(--tone-mint)); }
 .tone-peach { background: hsl(var(--tone-peach)); }
 .tone-sky { background: hsl(var(--tone-sky)); }
 .tone-rose { background: hsl(var(--tone-rose)); }
-.tone-lilac, .tone-mint, .tone-peach, .tone-sky, .tone-rose {
-  border: 1px solid hsl(0 0% 100% / 0.6);
-  box-shadow: 0 10px 28px -16px hsl(var(--primary) / 0.28);
-}
-.dark .tone-lilac, .dark .tone-mint, .dark .tone-peach, .dark .tone-sky, .dark .tone-rose { border-color: hsl(0 0% 100% / 0.07); }
+.tone-lilac, .tone-mint, .tone-peach, .tone-sky, .tone-rose { border: 1px solid hsl(0 0% 100% / 0.08); }
 
-/* Hero banner: soft gradient + floating blobs like a dashboard welcome card */
+/* Kanban cards: muted solid tones per column, as in the reference pipeline */
+.kcol-blue { --kc: var(--kc-blue); --kc-fg: var(--kc-blue-fg); }
+.kcol-olive { --kc: var(--kc-olive); --kc-fg: var(--kc-olive-fg); }
+.kcol-rust { --kc: var(--kc-rust); --kc-fg: var(--kc-rust-fg); }
+.kcol-slate { --kc: var(--kc-slate); --kc-fg: var(--kc-slate-fg); }
+.kcard {
+  background: hsl(var(--kc));
+  color: hsl(var(--kc-fg));
+  border: 1px solid hsl(0 0% 100% / 0.14);
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.12), 0 10px 24px -14px hsl(0 0% 0% / 0.6);
+}
+.kcard-sub { color: hsl(var(--kc-fg) / 0.66); }
+.kchip { background: hsl(var(--kc-fg) / 0.12); }
+
+/* Hero banner */
 .hero-card {
   position: relative; overflow: hidden;
-  background: linear-gradient(120deg, hsl(var(--primary) / 0.22), hsl(var(--accent) / 0.16) 60%, hsl(var(--primary) / 0.08));
-  border: 1px solid hsl(var(--primary) / 0.16);
+  background: linear-gradient(120deg, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.06) 60%);
+  border: 1px solid hsl(var(--primary) / 0.22);
 }
-.hero-card::before, .hero-card::after {
-  content: ''; position: absolute; border-radius: 9999px; filter: blur(8px); pointer-events: none;
+.hero-card::before {
+  content: ''; position: absolute; border-radius: 9999px; filter: blur(10px); pointer-events: none;
+  width: 240px; height: 240px; right: -50px; top: -90px;
+  background: radial-gradient(circle at 30% 30%, hsl(var(--primary) / 0.5), transparent 70%);
   animation: float 9s ease-in-out infinite;
 }
-.hero-card::before { width: 220px; height: 220px; right: -50px; top: -80px; background: radial-gradient(circle at 30% 30%, hsl(var(--accent) / 0.55), hsl(var(--primary) / 0.15) 65%, transparent 70%); }
-.hero-card::after { width: 140px; height: 140px; right: 120px; bottom: -70px; background: radial-gradient(circle, hsl(var(--primary) / 0.35), transparent 70%); animation-delay: -4s; }
 
 @keyframes float { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-10px, 12px, 0) scale(1.06); } }
 @keyframes fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -128,8 +154,6 @@ body {
 
 .animate-fade-up { animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
 .animate-pop { animation: pop 0.35s ease-out backwards; }
-.lift-soft { transition: box-shadow 0.25s ease, border-color 0.25s ease; }
-.lift-soft:hover { border-color: hsl(var(--primary) / 0.3); box-shadow: 0 2px 4px hsl(var(--primary) / 0.08), 0 20px 40px -16px hsl(var(--primary) / 0.4); }
 .skeleton {
   background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--secondary)) 50%, hsl(var(--muted)) 75%);
   background-size: 200% 100%; animation: shimmer 1.4s linear infinite; border-radius: 1rem;
@@ -139,13 +163,11 @@ body {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
-/* Primary CTA gradient — follows the user's chosen accent color (Settings →
-   Appearance) instead of being hardcoded, so "change the color of the whole
-   site" actually reaches every button, not just the glass surfaces. */
+/* Primary CTA — follows the chosen accent color (lime by default) */
 .accent-gradient {
   background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
   color: hsl(var(--primary-foreground));
-  box-shadow: 0 8px 24px -6px hsl(var(--primary) / 0.4);
+  box-shadow: 0 8px 24px -8px hsl(var(--primary) / 0.55);
 }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -165,3 +187,11 @@ select {
 }
 select:focus-visible { outline: 2px solid hsl(var(--ring) / 0.5); outline-offset: 1px; }
 .dark select option { background-color: hsl(var(--card, 230 30% 14%)); color: hsl(var(--foreground)); }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+select.glass, .dark select.glass {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.7rem center; background-size: 0.9rem;
+}

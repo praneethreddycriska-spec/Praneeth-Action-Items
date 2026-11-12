@@ -11,6 +11,7 @@ import SettingsPage from '@/pages/admin/SettingsPage'
 import BoardPage from '@/pages/BoardPage'
 import CommunitiesPage from '@/pages/CommunitiesPage'
 import DashboardPage from '@/pages/DashboardPage'
+import ReportsPage from '@/pages/ReportsPage'
 import MyActionsPage from '@/pages/team/MyActionsPage'
 
 function AdminLayoutRoute() {
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="communities" element={<CommunitiesPage />} />
         <Route path="team" element={<TeamPage />} />
         <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="reports" element={<ReportsPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Route>

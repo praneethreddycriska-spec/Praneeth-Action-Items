@@ -113,7 +113,7 @@ export default function DashboardPage() {
       <FadeUp>
         <div className="hero-card mb-5 rounded-[2rem] p-5 md:p-7">
           <div className="relative z-10 max-w-xl">
-            <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-primary"><Sparkles size={13} /> {format(new Date(), 'EEEE, MMM d')}</p>
+            <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-ink"><Sparkles size={13} /> {format(new Date(), 'EEEE, MMM d')}</p>
             <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{greeting}, {firstName}</h1>
             <p className="mt-1.5 text-sm text-foreground/65">
               {kpis.overdue > 0 ? `${kpis.overdue} overdue and ` : ''}{kpis.open} open action {kpis.open === 1 ? 'item' : 'items'} across your team.

@@ -7,7 +7,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setMode(resolvedMode === 'dark' ? 'light' : 'dark')}
-      className="glass rounded-xl p-2"
+      className="glass flex h-10 w-10 items-center justify-center rounded-full transition-transform active:scale-90"
       aria-label={resolvedMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
       title={resolvedMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
     >

@@ -103,7 +103,7 @@ export function RequestForm() {
         </p>
         <div className="mb-4 rounded-2xl bg-primary/10 py-3">
           <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Request ID</p>
-          <p className="text-lg font-bold text-primary">{result.request_code}</p>
+          <p className="text-lg font-bold text-ink">{result.request_code}</p>
         </div>
         <button
           onClick={() => { setResult(null); setValues(EMPTY); setRawIdea(''); setShowAiHelper(false); setOrgSelection(''); setOrgOther('') }}
